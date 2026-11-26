@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Petualangan 6 Pulau Pintar 3D - Preset Karakter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    input, select { user-select: text; -webkit-user-select: text; }
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; touch-action: none; font-family: 'Fredoka', 'Segoe UI', sans-serif; background: #0ea5e9; }
+    #game-container { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+    #game-container:active { cursor: grabbing; }
+
+    #hud { position: fixed; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; gap: 6px; flex-wrap: wrap; }
+    .hud-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .badge, .hud-btn { background: rgba(255,255,255,0.93); border: 3px solid #f59e0b; border-radius: 15px; padding: 5px 11px; font-size: 13.5px; font-weight: 700; color: #1e293b; box-shadow: 0 3px 0 #d97706; display: flex; align-items: center; gap: 5px; font-family: inherit; }
+    .badge.blue { border-color: #0284c7; box-shadow: 0 3px 0 #0369a1; }
+    .badge.purple { border-color: #8b5cf6; box-shadow: 0 3px 0 #6d28d9; display: none; }
+    .badge.comp { border-color: #10b981; box-shadow: 0 3px 0 #059669; }
+    #comp-arr { display: inline-block; transition: transform 0.08s linear; font-size: 15px; }
+    .hud-btn { pointer-events: auto; cursor: pointer; }
+    .hud-btn:active { transform: translateY(2px); }
+    .hud-btn.pink { border-color: #ec4899; box-shadow: 0 3px 0 #be185d; color: #831843; }
+    .hud-btn.gold { background: linear-gradient(180deg,#fde047,#f59e0b); border-color: #fff; box-shadow: 0 3px 0 #b45309; color: #713f12; }
+    .hud-btn.piko { background: linear-gradient(180deg,#38bdf8,#0284c7); border-color: #fff; box-shadow: 0 3px 0 #0369a1; color: #fff; }
+    .hud-btn.shop { background: linear-gradient(180deg,#f472b6,#db2777); border-color: #fff; box-shadow: 0 3px 0 #9d174d; color: #fff; }
+    .hud-btn.round { border-color: #10b981; box-shadow: 0 3px 0 #059669; border-radius: 50%; width: 38px; height: 38px; justify-content: center; padding: 0; font-size: 17px; }
+    .pill { background: #facc15; color: #713f12; border-radius: 9px; padding: 1px 6px; font-size: 11.5px; }
+
+    #piko-bubble { position: fixed; top: 64px; right: 12px; max-width: 290px; background: #fff; border: 3px solid #0ea5e9; border-radius: 18px; padding: 10px 13px; box-shadow: 0 8px 22px rgba(0,0,0,0.22); z-index: 12; font-size: 13.5px; color: #0f172a; display: none; }
+    .b-act { display: flex; justify-content: flex-end; gap: 5px; margin-top: 7px; }
+    .b-btn { border: none; background: #e0f2fe; color: #0369a1; border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; }
+    #hint-bar { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,0.76); color: #fff; padding: 8px 18px; border-radius: 26px; font-size: 13px; pointer-events: none; z-index: 10; white-space: nowrap; }
+
+    .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.62); backdrop-filter: blur(7px); display: flex; align-items: center; justify-content: center; z-index: 30; padding: 12px; touch-action: auto; }
+    .card { background: #fffbeb; border: 5px solid #f59e0b; border-radius: 24px; max-width: 620px; width: 100%; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; text-align: center; box-shadow: 0 10px 0 #d97706, 0 22px 45px rgba(0,0,0,0.4); touch-action: pan-y; }
+    .card.white { background: #fff; text-align: left; }
+    .card.blue { border-color: #0284c7; box-shadow: 0 10px 0 #0369a1; }
+    .card.indigo { border-color: #6366f1; box-shadow: 0 10px 0 #4338ca; }
+    .card.pink { border-color: #ec4899; box-shadow: 0 10px 0 #be185d; }
+    h1 { margin: 0 0 8px; font-size: 24px; color: #b45309; }
+    h2 { margin: 0 0 6px; font-size: 19px; }
+    p { font-size: 14px; color: #334155; line-height: 1.45; margin: 6px 0 12px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 9px; margin: 8px 0 12px; }
+    .p-card { background: #fff; border: 3px solid #cbd5e1; border-radius: 16px; padding: 10px 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; font-size: 12px; color: #64748b; text-align: center; }
+    .p-card.sel { background: #ecfdf5; border-color: #10b981; box-shadow: 0 4px 0 #059669; }
+    .p-card.cur { background: #fefce8; border-color: #eab308; box-shadow: 0 4px 0 #ca8a04; }
+    .p-card.lock { background: #f1f5f9; opacity: 0.65; cursor: not-allowed; }
+    .p-card.add { border-style: dashed; justify-content: center; }
+    .p-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; position: absolute; top: 7px; right: 7px; }
+    .acts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+    .btn { border: none; border-radius: 15px; padding: 11px 20px; font-size: 15.5px; font-weight: 700; font-family: inherit; cursor: pointer; color: #fff; }
+    .btn:active { transform: translateY(3px); }
+    .btn.green { background: #10b981; box-shadow: 0 4px 0 #047857; }
+    .btn.orange { background: #f59e0b; box-shadow: 0 4px 0 #b45309; }
+    .btn.indigo { background: #4f46e5; box-shadow: 0 4px 0 #3730a3; }
+    .btn.gray { background: #94a3b8; box-shadow: 0 4px 0 #64748b; font-size: 14px; padding: 9px 15px; }
+    .info-box { background: #fef3c7; border: 2px solid #fde68a; border-radius: 13px; padding: 9px 12px; margin-top: 12px; font-size: 12.5px; color: #78350f; text-align: left; }
+
+    .char-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 6px 0 12px; }
+    .char-pill { background: #fff; border: 3px solid #cbd5e1; border-radius: 14px; padding: 7px 4px; cursor: pointer; font-family: inherit; font-size: 12.5px; font-weight: 700; color: #334155; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .char-pill.act { background: #fdf2f8; border-color: #ec4899; color: #9d174d; box-shadow: 0 3px 0 #db2777; }
+
+    .q-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+    .q-tag { background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 700; }
+    .q-prg { background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 700; }
+    .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 12px 0; }
+    .opt-btn { background: #f8fafc; border: 3px solid #cbd5e1; border-radius: 14px; padding: 11px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; box-shadow: 0 4px 0 #94a3b8; }
+    .opt-btn.ok { background: #dcfce7; border-color: #22c55e; color: #166534; }
+    .opt-btn.no { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+    .m-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 9px; margin-bottom: 10px; }
+    .x-btn { background: #fee2e2; color: #dc2626; border: 2px solid #fca5a5; border-radius: 10px; width: 34px; height: 34px; font-weight: 700; cursor: pointer; }
+    .tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .t-btn { flex: 1; padding: 8px; border-radius: 12px; border: 2px solid #cbd5e1; background: #f8fafc; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .t-btn.act { background: #0284c7; border-color: #0284c7; color: #fff; }
+    .indigo .t-btn.act { background: #4f46e5; border-color: #4f46e5; }
+    .pink .t-btn.act { background: #db2777; border-color: #db2777; }
+    .prog { background: #f0f9ff; border: 2px solid #bae6fd; border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; }
+    .track { height: 11px; background: #dbeafe; border-radius: 8px; overflow: hidden; margin-top: 6px; }
+    .fill { height: 100%; width: 0%; background: #10b981; transition: width 0.3s; }
+    .f-row { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+    .chip { border: 2px solid #e2e8f0; background: #fff; border-radius: 16px; padding: 3px 10px; font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; }
+    .chip.act { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+    .t-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; max-height: 210px; overflow-y: auto; }
+    .t-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 13px; padding: 8px 10px; }
+    .t-item.done { background: #ecfdf5; border-color: #86efac; }
+    .t-left { display: flex; align-items: center; gap: 9px; flex: 1; cursor: pointer; }
+    .t-chk { width: 24px; height: 24px; border-radius: 7px; border: 2px solid #94a3b8; display: flex; align-items: center; justify-content: center; background: #fff; font-weight: 700; flex-shrink: 0; }
+    .t-item.done .t-chk { background: #22c55e; border-color: #16a34a; color: #fff; }
+    .t-item.done .t-txt { text-decoration: line-through; color: #64748b; }
+    .t-form { display: grid; grid-template-columns: 1fr 84px 92px auto; gap: 6px; background: #f1f5f9; padding: 9px; border-radius: 14px; }
+    .inp { padding: 7px 9px; border-radius: 9px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 13.5px; background: #fff; }
+    .sw { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 2px #cbd5e1; cursor: pointer; display: inline-block; }
+    .sw.act { box-shadow: 0 0 0 3px #4f46e5; transform: scale(1.1); }
+    .pk { border: 2px solid #cbd5e1; background: #fff; border-radius: 9px; padding: 3px 7px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .pk.act { border-color: #4f46e5; background: #e0e7ff; color: #3730a3; }
+
+    #mob-ctrl { display: none; position: fixed; bottom: 18px; left: 18px; right: 18px; justify-content: space-between; align-items: flex-end; pointer-events: none; z-index: 15; }
+    #joy-zone { pointer-events: auto; width: 118px; height: 118px; border-radius: 50%; background: rgba(255,255,255,0.28); border: 3px solid rgba(255,255,255,0.7); position: relative; touch-action: none; backdrop-filter: blur(4px); }
+    #joy-knob { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.92); border: 3px solid #0284c7; position: absolute; top: 30px; left: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.25); pointer-events: none; }
+    .jb { pointer-events: auto; width: 78px; height: 78px; border-radius: 50%; background: rgba(250,204,21,0.92); border: 4px solid #ca8a04; font-weight: 700; font-size: 13.5px; color: #713f12; box-shadow: 0 4px 0 #a16207; touch-action: none; }
+    .jb:active { transform: translateY(3px); }
+
+    body.is-mobile #hint-bar { display: none; }
+    body.is-mobile #mob-ctrl { display: flex; }
+    @media (max-width: 640px) {
+      .opts { grid-template-columns: 1fr; }
+      .badge, .hud-btn { font-size: 12px; padding: 4px 8px; }
+      .t-form { grid-template-columns: 1fr 1fr; }
+      .t-form input[type="text"], .t-form button { grid-column: 1 / -1; }
+      .char-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <div id="hud">
+    <div class="hud-group">
+      <button class="hud-btn pink" id="hud-prof"><span id="h-av">👦</span> <span id="h-nm">Budi</span> (Kls <span id="h-gr">1</span>)</button>
+      <button class="hud-btn gold" id="hud-isl"><span id="h-ic">🏝️</span> P.<span id="h-in">1</span>/6</button>
+      <div class="badge">💎 <span id="h-cr">0</span>/8</div>
+      <div class="badge comp"><span id="comp-arr">⬆️</span> <span id="comp-dst">0m</span></div>
+      <div class="badge blue">⭐ <span id="h-sc">0</span></div>
+      <div class="badge purple" id="h-tm">⏱️ <span id="h-tl">Fokus</span>: <span id="h-tt">15:00</span></div>
+    </div>
+    <div class="hud-group">
+      <button class="hud-btn shop" id="hud-shop">🎒 Gaya</button>
+      <button class="hud-btn piko" id="hud-asst">🤖 Piko <span class="pill" id="h-tp">0/0</span></button>
+      <button class="hud-btn round" id="snd-btn">🔊</button>
+    </div>
+  </div>
+
+  <div id="piko-bubble">
+    <strong>🤖 Piko:</strong> <span id="pb-txt"></span>
+    <div class="b-act">
+      <button class="b-btn" id="pb-spk">🔊 Dengar</button>
+      <button class="b-btn" id="pb-op">📋 Jadwal</button>
+      <button class="b-btn" id="pb-cl">Tutup</button>
+    </div>
+  </div>
+
+  <div id="hint-bar">Gerak: <b>W A S D</b> / <b>Panah</b> (+<b>Shift</b> Lari) | Lompat: <b>SPASI</b> | Kamera: <b>Seret Mouse / Q E</b> | Asisten: <b>M</b></div>
+
+  <div id="mob-ctrl">
+    <div id="joy-zone"><div id="joy-knob"></div></div>
+    <button class="jb" id="t-jump">LOMPAT</button>
+  </div>
+
+  <div class="overlay" id="m-start">
+    <div class="card">
+      <h1>🏝️ Petualangan 6 Pulau Pintar</h1>
+      <p>Pilih profil & preset karakter favoritmu (cowok, cewek, atau berhijab), lalu taklukkan <b>Pulau 1 hingga Pulau 6</b>!</p>
+      <div style="text-align:left; font-weight:700; color:#78350f; font-size:13.5px;">1. Pilih Profil Anak:</div>
+      <div class="grid" id="g-start"></div>
+      <div style="text-align:left; font-weight:700; color:#78350f; font-size:13.5px;">2. Pilih Preset Karakter 3D:</div>
+      <div class="char-bar" id="st-chars"></div>
+      <div class="acts">
+        <button type="button" class="btn green" id="btn-play">Mulai Petualangan! 🚀</button>
+        <button type="button" class="btn orange" id="btn-map1">🗺️ Peta Pulau</button>
+        <button type="button" class="btn indigo" id="btn-ortu1">👨‍👩‍👧 Panel Ortu</button>
+      </div>
+      <div class="info-box"><b>Info:</b> Di HP pakai <b>Joystick kiri</b> untuk jalan & <b>seret layar kanan</b> untuk putar kamera. PIN Ortu default: <b>1234</b>.</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-map" style="display:none;">
+    <div class="card">
+      <div class="m-head"><h2>🗺️ Peta 6 Pulau Petualangan</h2><button type="button" class="x-btn" id="x-map">✕</button></div>
+      <p id="map-sub" style="margin:0;"></p>
+      <div class="grid" id="g-map" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-shop" style="display:none; z-index:35;">
+    <div class="card white pink" style="max-width:560px;">
+      <div class="m-head"><h2>🎒 Ganti Karakter & Toko Gaya</h2><button type="button" class="x-btn" id="x-shop">✕</button></div>
+      <div class="tabs">
+        <button type="button" class="t-btn act" data-sht="sh-chr">👤 Karakter & Warna</button>
+        <button type="button" class="t-btn" data-sht="sh-acc">👑 Toko Aksesoris</button>
+      </div>
+      <div id="sh-chr">
+        <p style="margin:0 0 8px;">Pilih model karakter 3D & warna baju/hijab:</p>
+        <div class="char-bar" id="sh-chars"></div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; background:#fdf2f8; padding:10px; border-radius:12px;">
+          <b style="font-size:13.5px; color:#9d174d;">🎨 Warna Baju / Hijab:</b>
+          <span class="sw sh-sw" data-scl="#d93838" style="background:#d93838;"></span>
+          <span class="sw sh-sw" data-scl="#ec4899" style="background:#ec4899;"></span>
+          <span class="sw sh-sw" data-scl="#0284c7" style="background:#0284c7;"></span>
+          <span class="sw sh-sw" data-scl="#10b981" style="background:#10b981;"></span>
+          <span class="sw sh-sw" data-scl="#8b5cf6" style="background:#8b5cf6;"></span>
+          <span class="sw sh-sw" data-scl="#f59e0b" style="background:#f59e0b;"></span>
+        </div>
+      </div>
+      <div id="sh-acc" style="display:none;">
+        <p style="margin:0 0 8px;">Poin kamu: <b style="color:#db2777;">⭐ <span id="sh-sc">0</span> Poin</b></p>
+        <div class="grid" id="g-shop" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-switch" style="display:none;">
+    <div class="card" style="max-width:500px;">
+      <h2>👥 Ganti Profil Pemain</h2>
+      <div class="grid" id="g-quick"></div>
+      <div class="acts">
+        <button type="button" class="btn indigo" id="btn-ortu2">👨‍👩‍👧 Panel Ortu</button>
+        <button type="button" class="btn gray" id="x-switch">Lanjut Main</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-pin" style="display:none; z-index:45;">
+    <div class="card indigo" style="max-width:360px;">
+      <h2 style="color:#3730a3;">🔐 PIN Orang Tua</h2>
+      <p>Masukkan PIN untuk kelola profil & jadwal.<br><small>(Default: <b>1234</b>)</small></p>
+      <input type="password" inputmode="numeric" maxlength="6" id="pin-in" class="inp" style="width:160px; text-align:center; font-size:20px; letter-spacing:4px;" />
+      <div id="pin-err" style="color:#dc2626; font-size:13px; font-weight:700; min-height:18px; margin-top:5px;"></div>
+      <div class="acts"><button type="button" class="btn indigo" id="pin-ok">Masuk</button><button type="button" class="btn gray" id="pin-no">Batal</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-parent" style="display:none; z-index:40;">
+    <div class="card white indigo" style="max-width:660px;">
+      <div class="m-head"><h2>👨‍👩‍👧 Panel Utama Orang Tua</h2><button type="button" class="x-btn" id="x-parent">✕</button></div>
+      <div class="tabs">
+        <button type="button" class="t-btn act" data-pt="pt-ch">👧👦 Profil Anak</button>
+        <button type="button" class="t-btn" data-pt="pt-sc">📋 Atur Jadwal</button>
+        <button type="button" class="t-btn" data-pt="pt-st">🔐 Ganti PIN</button>
+      </div>
+      <div id="pt-ch">
+        <div id="p-ch-list" style="max-height:180px; overflow-y:auto;"></div>
+        <div style="background:#eef2ff; border:2px solid #c7d2fe; border-radius:14px; padding:12px; margin-top:10px;">
+          <b style="color:#3730a3;">➕ Tambah Profil Anak</b>
+          <div style="display:grid; grid-template-columns:1fr 120px; gap:8px; margin-top:6px;">
+            <input type="text" id="ch-nm" class="inp" placeholder="Nama anak (mis: Siti)" maxlength="20" />
+            <select id="ch-gr" class="inp"><option value="1" selected>Kelas 1</option><option value="2">Kelas 2</option><option value="3">Kelas 3</option><option value="4">Kelas 4</option><option value="5">Kelas 5</option><option value="6">Kelas 6</option></select>
+          </div>
+          <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap; margin-top:8px;">
+            <span style="font-size:12.5px; font-weight:700;">Karakter:</span>
+            <button type="button" class="pk act" data-pch="boy">👦 Cowok</button>
+            <button type="button" class="pk" data-pch="girl">👧 Cewek</button>
+            <button type="button" class="pk" data-pch="hijab">🧕 Berhijab</button>
+            <button type="button" class="pk" data-pch="peci">🧒 Peci</button>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:8px;">
+            <span style="font-size:12.5px; font-weight:700;">Warna Baju/Hijab:</span>
+            <span class="sw act" data-cl="#d93838" style="background:#d93838;"></span><span class="sw" data-cl="#ec4899" style="background:#ec4899;"></span>
+            <span class="sw" data-cl="#0284c7" style="background:#0284c7;"></span><span class="sw" data-cl="#10b981" style="background:#10b981;"></span>
+            <span class="sw" data-cl="#8b5cf6" style="background:#8b5cf6;"></span>
+          </div>
+          <div style="text-align:right; margin-top:8px;"><button type="button" class="btn indigo" id="save-ch" style="padding:8px 16px; font-size:14px;">+ Simpan Anak</button></div>
+        </div>
+      </div>
+      <div id="pt-sc" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+          <select id="p-sel-ch" class="inp"></select>
+          <button type="button" class="b-btn" id="p-rst-t" style="background:#fee2e2; color:#b91c1c; padding:7px 10px;">🔄 Reset Centang</button>
+        </div>
+        <div class="t-list" id="p-t-list"></div>
+        <form class="t-form" id="p-t-form">
+          <input type="text" id="p-t-in" class="inp" placeholder="Tambah jadwal anak..." required maxlength="50" />
+          <input type="time" id="p-t-tm" class="inp" value="16:00" required />
+          <select id="p-t-pd" class="inp"><option>Pagi</option><option>Siang</option><option selected>Sore</option><option>Malam</option></select>
+          <button type="submit" class="btn green" style="padding:7px 12px; font-size:13.5px;">+ Tambah</button>
+        </form>
+      </div>
+      <div id="pt-st" style="display:none;">
+        <div class="prog" style="background:#eef2ff; border-color:#c7d2fe;">
+          <b>Ganti PIN Orang Tua (4-6 angka):</b><br><br>
+          <input type="password" inputmode="numeric" maxlength="6" id="np-in" class="inp" placeholder="PIN baru" />
+          <button type="button" class="btn indigo" id="np-ok" style="padding:8px 16px; font-size:14px;">Simpan</button>
+          <div id="np-msg" style="font-size:13px; font-weight:700; margin-top:6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-quiz" style="display:none; z-index:25;">
+    <div class="card blue">
+      <div class="q-top"><div class="q-tag" id="q-sub">Matematika</div><div class="q-prg" id="q-prg">💎 Soal 1 / 3</div></div>
+      <div class="track" style="margin:4px 0 10px; height:9px;"><div class="fill" id="q-bar"></div></div>
+      <div id="q-txt" style="font-size:18.5px; font-weight:700; color:#0f172a; margin:8px 0;"></div>
+      <div class="opts" id="q-opts"></div>
+      <div id="q-fb" style="min-height:22px; font-weight:700; font-size:14.5px;"></div>
+      <button type="button" class="btn gray" id="x-quiz" style="margin-top:8px;">Tutup Sebentar</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-asst" style="display:none; z-index:35;">
+    <div class="card white blue" style="max-width:650px;">
+      <div class="m-head">
+        <div><h2 id="a-title">🤖 Asisten Piko</h2><div id="a-greet" style="font-size:13px; color:#0369a1; font-weight:600;"></div></div>
+        <button type="button" class="x-btn" id="x-asst">✕</button>
+      </div>
+      <div class="tabs">
+        <button type="button" class="t-btn act" data-at="at-sch">📋 Jadwal</button>
+        <button type="button" class="t-btn" data-at="at-tm">⏱️ Timer</button>
+        <button type="button" class="t-btn" data-at="at-st">🏆 Prestasi</button>
+      </div>
+      <div id="at-sch">
+        <div class="prog">
+          <div style="display:flex; justify-content:space-between; font-size:13.5px; font-weight:700; color:#0369a1;"><span id="a-pr-lbl">0/0</span><span id="a-rk-lbl">🌟 Ayo!</span></div>
+          <div class="track"><div class="fill" id="a-pr-fill"></div></div>
+        </div>
+        <div class="f-row">
+          <button type="button" class="chip act" data-f="Semua">Semua</button><button type="button" class="chip" data-f="Pagi">☀️ Pagi</button>
+          <button type="button" class="chip" data-f="Siang">🌤️ Siang</button><button type="button" class="chip" data-f="Sore">🌇 Sore</button><button type="button" class="chip" data-f="Malam">🌙 Malam</button>
+        </div>
+        <div class="t-list" id="a-t-list"></div>
+        <form class="t-form" id="a-t-form">
+          <input type="text" id="a-t-in" class="inp" placeholder="Tambah kegiatan sendiri..." required maxlength="50" />
+          <input type="time" id="a-t-tm" class="inp" value="16:00" required />
+          <select id="a-t-pd" class="inp"><option>Pagi</option><option>Siang</option><option selected>Sore</option><option>Malam</option></select>
+          <button type="submit" class="btn green" style="padding:7px 12px; font-size:13.5px;">+ Tambah</button>
+        </form>
+      </div>
+      <div id="at-tm" style="display:none; text-align:center;">
+        <div id="tm-title" style="font-weight:700; color:#0369a1;">⏱️ Belajar Fokus</div>
+        <div id="tm-disp" style="font-size:48px; font-weight:700; margin:6px 0;">15:00</div>
+        <div class="acts">
+          <button type="button" class="chip pr-btn" data-m="15" data-l="Belajar Fokus" data-r="30">📚 Belajar 15m</button>
+          <button type="button" class="chip pr-btn" data-m="10" data-l="Baca Buku" data-r="25">📖 Baca 10m</button>
+          <button type="button" class="chip pr-btn" data-m="20" data-l="Main Sehat" data-r="0">🎮 Main 20m</button>
+          <button type="button" class="chip pr-btn" data-m="5" data-l="Istirahat Mata" data-r="10">👀 Istirahat 5m</button>
+        </div>
+        <div class="acts" style="margin-top:14px;">
+          <button type="button" class="btn indigo" id="tm-go" style="background:#0284c7;">▶ Mulai</button>
+          <button type="button" class="btn gray" id="tm-rs">🔄 Ulang</button>
+        </div>
+      </div>
+      <div id="at-st" style="display:none;">
+        <div class="prog" style="background:#fffbeb; border-color:#fde68a;"><p id="st-info" style="margin:0; line-height:1.8;"></p></div>
+        <div style="text-align:right;"><button type="button" class="btn indigo" id="btn-ortu3" style="padding:8px 16px; font-size:14px;">👨‍👩‍👧 Panel Ortu</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="m-win" style="display:none;">
+    <div class="card">
+      <h1 id="w-tit">🎉 Pulau Selesai!</h1>
+      <p id="w-dsc"></p>
+      <div class="badge" style="margin:0 auto 16px; width:fit-content;">⭐ Total Poin: <span id="w-sc">0</span></div>
+      <div class="acts">
+        <button type="button" class="btn green" id="btn-next">Lanjut Pulau Berikutnya ➡️</button>
+        <button type="button" class="btn orange" id="btn-map2">🗺️ Peta Pulau</button>
+        <button type="button" class="btn gray" id="btn-rep">Ulangi Pulau 🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    var isMob = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || window.innerWidth <= 900;
+    if (isMob) document.body.classList.add('is-mobile');
+
+    var CHAR_PRESETS = [
+      { id: 'boy', av: '👦', nm: 'Cowok' },
+      { id: 'girl', av: '👧', nm: 'Cewek' },
+      { id: 'hijab', av: '🧕', nm: 'Berhijab' },
+      { id: 'peci', av: '🧒', nm: 'Cowok Peci' }
+    ];
+
+    var ISLANDS = [
+      { n: 1, ic: '🏝️', nm: 'Pulau Tropis Ceria', ds: 'Hutan pinus, pantai pasir emas & dermaga.', sT: 0x1c6bd0, sM: 0x70c2f5, sH: 0xdbeeff, fg: 0x9bd7f5, wt: 0x0685b8, sd: 0xf2d99b, dsd: 0xc2a36b, gL: 0x4a9e3b, gH: 0x367d2d, pt: 0xb09468, tr: 'pine', tc: [0x1f6b29,0x2a7d34,0x389440], mn: 'plaza', pier: true, palm: true, fc: [0xf43f5e,0xfacc15,0xc084fc,0xfb923c], wx: 'sun' },
+      { n: 2, ic: '🌸', nm: 'Lembah Sakura', ds: 'Padang bunga musim semi & kelopak sakura.', sT: 0x3b82f6, sM: 0x93c5fd, sH: 0xfde2e4, fg: 0xf5d0fe, wt: 0x0ea5e9, sd: 0xfce7f3, dsd: 0xd8b4fe, gL: 0x65a30d, gH: 0x4d7c0f, pt: 0xd6d3d1, tr: 'sakura', tc: [0xf472b6,0xf9a8d4,0xfbcfe8], mn: 'arch', pier: false, palm: false, fc: [0xf472b6,0xfb7185,0xfef08a,0xffffff], wx: 'petal' },
+      { n: 3, ic: '🏜️', nm: 'Gurun Piramida', ds: 'Bukit pasir emas, kaktus & piramida kuno.', sT: 0x1d4ed8, sM: 0xfb923c, sH: 0xfef08a, fg: 0xfde68a, wt: 0x0891b2, sd: 0xfde047, dsd: 0xd97706, gL: 0xeab308, gH: 0xca8a04, pt: 0xb45309, tr: 'cactus', tc: [0x15803d,0x16a34a,0x22c55e], mn: 'pyramid', pier: false, palm: true, fc: [0xfacc15,0xf97316,0xef4444,0xfef08a], wx: 'sun' },
+      { n: 4, ic: '❄️', nm: 'Pulau Salju Kutub', ds: 'Hujan salju sejuk, cemara putih & igloo.', sT: 0x1e3a8a, sM: 0x7dd3fc, sH: 0xf0f9ff, fg: 0xe0f2fe, wt: 0x0369a1, sd: 0xbae6fd, dsd: 0x7dd3fc, gL: 0xf1f5f9, gH: 0xffffff, pt: 0x94a3b8, tr: 'snow', tc: [0x0f766e,0xe2e8f0,0xffffff], mn: 'igloo', pier: false, palm: false, fc: [0x38bdf8,0xe0f2fe,0x818cf8,0xffffff], wx: 'snow' },
+      { n: 5, ic: '🌋', nm: 'Lembah Kristal Senja', ds: 'Batu vulkanik & menara kristal ungu.', sT: 0x311042, sM: 0x7e22ce, sH: 0xf97316, fg: 0x9333ea, wt: 0xc2410c, sd: 0x78716c, dsd: 0x44403c, gL: 0x57534e, gH: 0x6b21a8, pt: 0xa8a29e, tr: 'crys', tc: [0xa855f7,0xc084fc,0xf43f5e], mn: 'spire', pier: false, palm: false, fc: [0xf43f5e,0xe879f9,0xfbbf24,0x38bdf8], wx: 'ember' },
+      { n: 6, ic: '🌈', nm: 'Pulau Bintang Juara', ds: 'Langit aurora berbintang & piala emas!', sT: 0x090d2b, sM: 0x1e3a8a, sH: 0x2dd4bf, fg: 0x1e40af, wt: 0x1d4ed8, sd: 0xa7f3d0, dsd: 0x34d399, gL: 0x10b981, gH: 0x059669, pt: 0xfde047, tr: 'rain', tc: [0x34d399,0x38bdf8,0xfacc15], mn: 'trophy', pier: true, palm: true, fc: [0xfacc15,0x38bdf8,0xf472b6,0x34d399], wx: 'star' }
+    ];
+
+    var SHOP_ITEMS = [
+      { id: 'crown', ic: '👑', nm: 'Mahkota Emas', ds: 'Mahkota raja/ratu pintar 3D!', cost: 150, type: 'hat' },
+      { id: 'prop', ic: '🧢', nm: 'Topi Baling-Baling', ds: 'Baling-baling berputar di kepala!', cost: 250, type: 'hat' },
+      { id: 'cape', ic: '🦸', nm: 'Jubah Pahlawan', ds: 'Jubah keren di punggung!', cost: 300, type: 'cape' },
+      { id: 'turbo', ic: '⚡', nm: 'Sepatu Turbo', ds: 'Lari jauh lebih cepat di pulau!', cost: 200, type: 'turbo' }
+    ];
+
+    var AudioSys = {
+      ctx: null, on: true,
+      init: function() { try { var AC = window.AudioContext || window.webkitAudioContext; if (AC && !this.ctx) this.ctx = new AC(); if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); } catch (e) {} },
+      tone: function(f, t, d, v, sl) {
+        if (!this.on) return;
+        try {
+          this.init(); if (!this.ctx) return;
+          var o = this.ctx.createOscillator(), g = this.ctx.createGain();
+          o.type = t; o.frequency.setValueAtTime(f, this.ctx.currentTime);
+          if (sl) o.frequency.exponentialRampToValueAtTime(sl, this.ctx.currentTime + d);
+          g.gain.setValueAtTime(v || 0.14, this.ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + d);
+          o.connect(g); g.connect(this.ctx.destination); o.start(); o.stop(this.ctx.currentTime + d);
+        } catch (e) {}
+      },
+      jump: function() { this.tone(260, 'sine', 0.2, 0.14, 540); },
+      coin: function() { var s = this; s.tone(880, 'sine', 0.1, 0.1); setTimeout(function() { s.tone(1318, 'sine', 0.16, 0.1); }, 60); },
+      ok: function() { var s = this; s.tone(523, 'triangle', 0.12, 0.16); setTimeout(function() { s.tone(659, 'triangle', 0.12, 0.16); }, 90); setTimeout(function() { s.tone(784, 'triangle', 0.24, 0.18); }, 180); },
+      no: function() { this.tone(210, 'sawtooth', 0.18, 0.09, 150); },
+      win: function() { var s = this; [523, 659, 784, 1046].forEach(function(f, i) { setTimeout(function() { s.tone(f, 'triangle', 0.3, 0.18); }, i * 130); }); },
+      speak: function(txt) { if (!this.on || !('speechSynthesis' in window)) return; try { window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(txt); u.lang = 'id-ID'; u.pitch = 1.1; window.speechSynthesis.speak(u); } catch (e) {} }
+    };
+
+    function defTasks() {
+      return [
+        { id: 't1', t: '🛏️ Bangun & rapikan kasur', tm: '05:30', p: 'Pagi', d: false },
+        { id: 't2', t: '🪥 Mandi pagi & gosok gigi', tm: '06:00', p: 'Pagi', d: false },
+        { id: 't3', t: '🥣 Sarapan sehat', tm: '06:30', p: 'Pagi', d: false },
+        { id: 't4', t: '🏫 Belajar / sekolah semangat', tm: '07:00', p: 'Pagi', d: false },
+        { id: 't5', t: '🍱 Makan siang & cuci tangan', tm: '12:30', p: 'Siang', d: false },
+        { id: 't6', t: '😴 Istirahat siang', tm: '13:30', p: 'Siang', d: false },
+        { id: 't7', t: '📚 Kerjakan PR & belajar', tm: '16:00', p: 'Sore', d: false },
+        { id: 't8', t: '🚿 Mandi sore & olahraga', tm: '17:00', p: 'Sore', d: false },
+        { id: 't9', t: '🎒 Siapkan tas besok', tm: '19:30', p: 'Malam', d: false },
+        { id: 't10', t: '🌙 Gosok gigi & tidur tepat waktu', tm: '20:30', p: 'Malam', d: false }
+      ];
+    }
+    function today() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+    var SKEY = 'pulau_pintar_v5';
+    var Store = {
+      d: { pin: '1234', aid: 'c1', ch: [{ id: 'c1', nm: 'Budi', gr: 1, av: '👦', chr: 'boy', cl: '#d93838', sc: 0, ci: 1, ui: 1, doneI: [], own: [], hat: 'cap', cape: false, turbo: false, ld: today(), ts: defTasks() }] },
+      flt: 'Semua',
+      load: function() {
+        try {
+          var raw = localStorage.getItem(SKEY) || localStorage.getItem('pulau_pintar_v4');
+          if (raw) {
+            var p = JSON.parse(raw);
+            if (p && p.ch && p.ch.length) {
+              this.d.pin = p.pin || '1234';
+              this.d.ch = p.ch.map(function(c) {
+                if (c.ld !== today()) { c.ts = (c.ts || defTasks()).map(function(x) { x.d = false; return x; }); c.ld = today(); }
+                c.ci = Math.min(6, Math.max(1, Number(c.ci) || 1)); c.ui = Math.min(6, Math.max(1, Number(c.ui) || 1));
+                c.doneI = c.doneI || []; c.own = c.own || []; c.hat = c.hat || 'cap'; c.cape = !!c.cape; c.turbo = !!c.turbo; c.chr = c.chr || 'boy';
+                return c;
+              });
+              this.d.aid = this.d.ch.some(function(c) { return c.id === p.aid; }) ? p.aid : this.d.ch[0].id;
+            }
+          }
+        } catch (e) {}
+        this.save();
+      },
+      save: function() { try { localStorage.setItem(SKEY, JSON.stringify(this.d)); } catch (e) {} },
+      cur: function() { var id = this.d.aid, c = this.d.ch.find(function(x) { return x.id === id; }); if (!c) { c = this.d.ch[0]; this.d.aid = c.id; } return c; },
+      pick: function(id) { this.d.aid = id; var c = this.cur(); gs.sc = c.sc || 0; gs.isl = c.ci || 1; syncGear(); this.save(); updHUD(); rGrids(); rCharBars(); },
+      setChar: function(chrId) {
+        var c = this.cur(), pr = CHAR_PRESETS.find(function(x) { return x.id === chrId; }) || CHAR_PRESETS[0];
+        c.chr = pr.id; c.av = pr.av;
+        syncGear(); this.save(); updHUD(); rGrids(); rCharBars();
+      }
+    };
+
+    var QPOOL = [
+      { t: '1-2', s: 'B. Indonesia Kls 1-2 📖', q: 'Lawan kata dari BESAR adalah...', o: ['Panjang', 'Kecil', 'Tinggi', 'Lebar'], a: 1 },
+      { t: '1-2', s: 'B. Indonesia Kls 1-2 📖', q: 'Sebelum makan sebaiknya kita mencuci...', o: ['Kaki', 'Tangan', 'Baju', 'Sepatu'], a: 1 },
+      { t: '1-2', s: 'PPKn Kls 1-2 🇮🇩', q: 'Lambang sila pertama Pancasila adalah...', o: ['Bintang', 'Rantai', 'Beringin', 'Padi Kapas'], a: 0 },
+      { t: '1-2', s: 'PPKn Kls 1-2 🇮🇩', q: 'Lambang sila kedua Pancasila adalah...', o: ['Bintang', 'Rantai Emas', 'Kepala Banteng', 'Beringin'], a: 1 },
+      { t: '1-2', s: 'IPA Kls 1-2 🌿', q: 'Hewan yang berkokok pagi hari adalah...', o: ['Bebek', 'Kucing', 'Ayam jantan', 'Burung hantu'], a: 2 },
+      { t: '1-2', s: 'IPA Kls 1-2 🌿', q: 'Kita melihat warna alam memakai...', o: ['Telinga', 'Hidung', 'Mata', 'Kulit'], a: 2 },
+      { t: '1-2', s: 'IPA Kls 1-2 🌿', q: 'Kita mendengar suara musik menggunakan...', o: ['Mata', 'Hidung', 'Lidah', 'Telinga'], a: 3 },
+      { t: '1-2', s: 'Matematika Kls 1-2 🔢', q: 'Bentuk roda sepeda adalah...', o: ['Segitiga', 'Persegi', 'Lingkaran', 'Trapesium'], a: 2 },
+      { t: '3-4', s: 'IPA Kls 3-4 🌿', q: 'Hewan pemakan tumbuhan saja disebut...', o: ['Karnivora', 'Omnivora', 'Herbivora', 'Insektivora'], a: 2 },
+      { t: '3-4', s: 'IPA Kls 3-4 🌿', q: 'Hewan pemakan daging disebut...', o: ['Herbivora', 'Karnivora', 'Omnivora', 'Frugivora'], a: 1 },
+      { t: '3-4', s: 'IPA Kls 3-4 🌿', q: 'Perubahan cair menjadi gas disebut...', o: ['Membeku', 'Mencair', 'Menguap', 'Mengembun'], a: 2 },
+      { t: '3-4', s: 'B. Indonesia Kls 3-4 📖', q: 'Antonim kata HEMAT adalah...', o: ['Rajin', 'Boros', 'Pelit', 'Cerdas'], a: 1 },
+      { t: '3-4', s: 'B. Indonesia Kls 3-4 📖', q: 'Sinonim kata GEMBIRA adalah...', o: ['Sedih', 'Takut', 'Senang', 'Marah'], a: 2 },
+      { t: '3-4', s: 'PPKn Kls 3-4 🇮🇩', q: 'Arti Bhinneka Tunggal Ika adalah...', o: ['Bersatu kita teguh', 'Berbeda-beda tetap satu jua', 'Maju terus', 'Cinta tanah air'], a: 1 },
+      { t: '5-6', s: 'IPA Kls 5-6 🌿', q: 'Tumbuhan membuat makanan dengan cahaya disebut...', o: ['Respirasi', 'Fotosintesis', 'Transpirasi', 'Penyerbukan'], a: 1 },
+      { t: '5-6', s: 'IPA Kls 5-6 🌿', q: 'Alat kelamin betina pada bunga adalah...', o: ['Benang sari', 'Kelopak', 'Mahkota', 'Putik'], a: 3 },
+      { t: '5-6', s: 'B. Indonesia Kls 5-6 📖', q: 'Pesan moral dalam cerita disebut...', o: ['Alur', 'Latar', 'Watak', 'Amanat'], a: 3 },
+      { t: '5-6', s: 'IPS Kls 5-6 🇮🇩', q: 'Gunung tertinggi di Pulau Jawa adalah...', o: ['Merapi', 'Bromo', 'Semeru', 'Slamet'], a: 2 },
+      { t: 'all', s: 'Umum 🇮🇩', q: 'Hari Kemerdekaan RI setiap tanggal...', o: ['17 Agustus', '1 Juni', '28 Oktober', '10 November'], a: 0 },
+      { t: 'all', s: 'IPA 🌿', q: 'Sumber energi panas terbesar Bumi adalah...', o: ['Bulan', 'Matahari', 'Listrik', 'Api'], a: 1 },
+      { t: 'all', s: 'IPA 🌿', q: 'Planet berjuluk Planet Merah adalah...', o: ['Venus', 'Mars', 'Jupiter', 'Saturnus'], a: 1 },
+      { t: 'all', s: 'Umum 🇮🇩', q: 'Warna bendera Indonesia adalah...', o: ['Merah Putih', 'Putih Merah', 'Biru Putih', 'Merah Kuning'], a: 0 },
+      { t: 'all', s: 'IPA 🌿', q: 'Bagian tumbuhan penyerap air dari tanah adalah...', o: ['Daun', 'Batang', 'Akar', 'Bunga'], a: 2 },
+      { t: 'all', s: 'PPKn 🇮🇩', q: 'Jumlah bulu sayap burung Garuda ada...', o: ['8 helai', '17 helai', '19 helai', '45 helai'], a: 1 }
+    ];
+
+    function makeOpts(ans, unit) {
+      var u = unit || '', set = [ans];
+      while (set.length < 4) {
+        var off = (Math.floor(Math.random() * 9) - 4) || 3, cand = ans + off;
+        if (cand < 0) cand = ans + Math.floor(Math.random() * 10) + 1;
+        if (set.indexOf(cand) === -1) set.push(cand);
+      }
+      set.sort(function() { return Math.random() - 0.5; });
+      return { o: set.map(function(x) { return x + u; }), a: set.indexOf(ans) };
+    }
+    function genMathQ(gr) {
+      var kind = Math.floor(Math.random() * 3), q = '', res, op;
+      if (gr <= 2) {
+        if (kind === 0) { var a = 3 + Math.floor(Math.random() * 13), b = 2 + Math.floor(Math.random() * 11); res = a + b; q = 'Berapakah hasil dari ' + a + ' + ' + b + '?'; }
+        else if (kind === 1) { var a = 11 + Math.floor(Math.random() * 10), b = 2 + Math.floor(Math.random() * (a - 3)); res = a - b; q = 'Ada ' + a + ' buah, dimakan ' + b + '. Sisa buah sekarang...'; }
+        else { var a = 2 + Math.floor(Math.random() * 6), b = 2 + Math.floor(Math.random() * 6), c = 1 + Math.floor(Math.random() * 5); res = a + b + c; q = 'Hitung hasil dari ' + a + ' + ' + b + ' + ' + c + '!'; }
+        op = makeOpts(res, ''); return { s: 'Matematika Kls 1-2 🔢', q: q, o: op.o, a: op.a };
+      } else if (gr <= 4) {
+        if (kind === 0) { var a = 3 + Math.floor(Math.random() * 7), b = 3 + Math.floor(Math.random() * 7); res = a * b; q = 'Hasil perkalian ' + a + ' x ' + b + ' adalah...'; }
+        else if (kind === 1) { var a = 3 + Math.floor(Math.random() * 7), b = 3 + Math.floor(Math.random() * 7); res = b; q = 'Hasil pembagian ' + (a * b) + ' : ' + a + ' adalah...'; }
+        else { var a = 25 + Math.floor(Math.random() * 45), b = 15 + Math.floor(Math.random() * 35); res = a + b; q = 'Berapakah hasil dari ' + a + ' + ' + b + '?'; }
+        op = makeOpts(res, ''); return { s: 'Matematika Kls 3-4 🔢', q: q, o: op.o, a: op.a };
+      } else {
+        if (kind === 0) { var a = 11 + Math.floor(Math.random() * 9), b = 4 + Math.floor(Math.random() * 6); res = a * b; q = 'Hasil dari ' + a + ' x ' + b + ' adalah...'; op = makeOpts(res, ''); }
+        else if (kind === 1) { var bs = (3 + Math.floor(Math.random() * 6)) * 2, h = 4 + Math.floor(Math.random() * 8); res = (bs * h) / 2; q = 'Luas segitiga alas ' + bs + ' cm dan tinggi ' + h + ' cm adalah...'; op = makeOpts(res, ' cm2'); }
+        else { var p = 7 + Math.floor(Math.random() * 9), l = 4 + Math.floor(Math.random() * 6); res = 2 * (p + l); q = 'Keliling persegi panjang ' + p + ' cm x ' + l + ' cm adalah...'; op = makeOpts(res, ' cm'); }
+        return { s: 'Matematika Kls 5-6 🔢', q: q, o: op.o, a: op.a };
+      }
+    }
+    function getCrystalQs(gr) {
+      var cnt = 3 + Math.floor(Math.random() * 3), tr = gr <= 2 ? '1-2' : (gr <= 4 ? '3-4' : '5-6');
+      var pool = QPOOL.filter(function(q) { return q.t === tr || q.t === 'all'; }).sort(function() { return Math.random() - 0.5; });
+      var list = [], pIdx = 0;
+      for (var i = 0; i < cnt; i++) { if (i % 2 === 0 || pIdx >= pool.length) list.push(genMathQ(gr)); else { list.push(pool[pIdx]); pIdx++; } }
+      return list.sort(function() { return Math.random() - 0.5; });
+    }
+
+    var gs = { run: false, pau: false, won: false, isl: 1, sc: 0, cr: 0, vy: 0, gnd: true, ca: 0, cp: 0.44, cd: 11.5, wt: 0, ac: null, qTries: 0, qLock: false };
+    var Tmr = {
+      tot: 900, rem: 900, lbl: 'Belajar Fokus', rew: 30, go: false, end: 0,
+      fmt: function(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); },
+      ui: function() {
+        var s = this.fmt(this.rem);
+        document.getElementById('tm-disp').textContent = s; document.getElementById('h-tt').textContent = s;
+        document.getElementById('h-tl').textContent = this.lbl; document.getElementById('tm-title').textContent = '⏱️ ' + this.lbl;
+        document.getElementById('tm-go').textContent = this.go ? '⏸️ Jeda' : '▶ Mulai';
+        document.getElementById('h-tm').style.display = (this.go || this.rem < this.tot) ? 'flex' : 'none';
+      },
+      set: function(m, l, r) { this.go = false; this.tot = m * 60; this.rem = this.tot; this.lbl = l; this.rew = r; this.ui(); },
+      tog: function() { if (this.go) this.go = false; else { if (this.rem <= 0) this.rem = this.tot; this.end = Date.now() + this.rem * 1000; this.go = true; } this.ui(); },
+      rst: function() { this.go = false; this.rem = this.tot; this.ui(); },
+      tick: function() {
+        if (!this.go) return;
+        var l = Math.max(0, Math.ceil((this.end - Date.now()) / 1000));
+        if (l !== this.rem) {
+          this.rem = l; this.ui();
+          if (l === 0) {
+            this.go = false; this.ui(); AudioSys.win();
+            var c = Store.cur(), msg = 'Waktu ' + this.lbl + ' ' + c.nm + ' selesai!';
+            if (this.rew > 0) { c.sc += this.rew; gs.sc = c.sc; Store.save(); updHUD(); msg += ' Bonus +' + this.rew + ' Poin!'; }
+            bubble(msg, 10000); AudioSys.speak(msg);
+          }
+        }
+      }
+    };
+
+    var bTmr = null;
+    function bubble(txt, ms) {
+      var b = document.getElementById('piko-bubble'); document.getElementById('pb-txt').textContent = txt; b.style.display = 'block';
+      if (bTmr) clearTimeout(bTmr); if (ms) bTmr = setTimeout(function() { b.style.display = 'none'; }, ms);
+    }
+    function updHUD() {
+      var c = Store.cur(), th = ISLANDS[gs.isl - 1] || ISLANDS[0]; gs.sc = c.sc || 0;
+      document.getElementById('h-av').textContent = c.av; document.getElementById('h-nm').textContent = c.nm;
+      document.getElementById('h-gr').textContent = c.gr; document.getElementById('h-ic').textContent = th.ic;
+      document.getElementById('h-in').textContent = gs.isl; document.getElementById('h-cr').textContent = gs.cr;
+      document.getElementById('h-sc').textContent = gs.sc;
+      document.getElementById('h-tp').textContent = c.ts.filter(function(x) { return x.d; }).length + '/' + c.ts.length;
+      Store.save();
+    }
+
+    function rCharBars() {
+      var curC = Store.cur();
+      ['st-chars', 'sh-chars'].forEach(function(barId) {
+        var bar = document.getElementById(barId); if (!bar) return; bar.innerHTML = '';
+        CHAR_PRESETS.forEach(function(pr) {
+          var btn = document.createElement('button');
+          btn.type = 'button'; btn.className = 'char-pill' + (curC.chr === pr.id ? ' act' : '');
+          btn.innerHTML = '<span style="font-size:24px;">' + pr.av + '</span><span>' + pr.nm + '</span>';
+          btn.onclick = function() { Store.setChar(pr.id); AudioSys.coin(); };
+          bar.appendChild(btn);
+        });
+      });
+      document.querySelectorAll('.sh-sw').forEach(function(s) {
+        s.classList.toggle('act', s.dataset.scl === curC.cl);
+      });
+    }
+
+    function openShop(tabId) {
+      gs.pau = true; rstKeys();
+      var target = tabId || 'sh-chr';
+      document.querySelectorAll('[data-sht]').forEach(function(b) { b.classList.toggle('act', b.dataset.sht === target); });
+      document.getElementById('sh-chr').style.display = target === 'sh-chr' ? 'block' : 'none';
+      document.getElementById('sh-acc').style.display = target === 'sh-acc' ? 'block' : 'none';
+      rCharBars();
+      var c = Store.cur(), g = document.getElementById('g-shop'); g.innerHTML = '';
+      document.getElementById('sh-sc').textContent = c.sc;
+      SHOP_ITEMS.forEach(function(it) {
+        var owned = c.own.indexOf(it.id) !== -1;
+        var eq = (it.type === 'hat' && c.hat === it.id) || (it.type === 'cape' && c.cape) || (it.type === 'turbo' && c.turbo);
+        var d = document.createElement('div'); d.className = 'p-card' + (eq ? ' sel' : '');
+        var btnTxt = eq ? '✅ Dipakai' : (owned ? 'Pakai' : 'Beli ⭐ ' + it.cost);
+        d.innerHTML = '<div style="font-size:32px;">' + it.ic + '</div><b style="color:#0f172a;font-size:14px;">' + it.nm + '</b><div>' + it.ds + '</div><button type="button" class="b-btn" style="margin-top:4px;background:' + (eq ? '#dcfce7;color:#166534' : (owned ? '#dbeafe;color:#1e40af' : '#fef3c7;color:#92400e')) + ';">' + btnTxt + '</button>';
+        d.onclick = function() {
+          if (!owned) {
+            if (c.sc < it.cost) { AudioSys.no(); return alert('Poin belum cukup! Ayo jawab kuis kristal, ambil koin, atau selesaikan jadwal Piko!'); }
+            c.sc -= it.cost; c.own.push(it.id); AudioSys.ok();
+          } else AudioSys.coin();
+          if (it.type === 'hat') c.hat = (c.hat === it.id) ? 'cap' : it.id;
+          if (it.type === 'cape') c.cape = !c.cape;
+          if (it.type === 'turbo') c.turbo = !c.turbo;
+          syncGear(); Store.save(); updHUD(); openShop('sh-acc');
+        };
+        g.appendChild(d);
+      });
+      document.getElementById('m-shop').style.display = 'flex';
+    }
+
+    function openMap() {
+      gs.pau = true;
+      var c = Store.cur(), g = document.getElementById('g-map'); g.innerHTML = '';
+      document.getElementById('map-sub').textContent = c.av + ' ' + c.nm + ' (Kls ' + c.gr + ') • Terbuka: ' + c.ui + '/6';
+      ISLANDS.forEach(function(th) {
+        var un = th.n <= c.ui, dn = c.doneI.indexOf(th.n) !== -1, cr = th.n === gs.isl;
+        var d = document.createElement('div'); d.className = 'p-card' + (cr ? ' cur' : '') + (dn ? ' sel' : '') + (!un ? ' lock' : '');
+        d.innerHTML = '<div style="font-size:30px;">' + (un ? th.ic : '🔒') + '</div><b style="color:#0f172a;font-size:14px;">Pulau ' + th.n + ': ' + th.nm + '</b><div>' + th.ds + '</div><b>' + (dn ? '✅ Selesai' : (cr ? '🚩 Aktif' : (un ? '🔓 Terbuka' : '🔒 Terkunci'))) + '</b>';
+        if (un) d.onclick = function() { document.getElementById('m-map').style.display = 'none'; startIsl(th.n); };
+        g.appendChild(d);
+      });
+      document.getElementById('m-map').style.display = 'flex';
+    }
+
+    function rGrids() {
+      ['g-start', 'g-quick'].forEach(function(gid) {
+        var g = document.getElementById(gid); if (!g) return; g.innerHTML = '';
+        Store.d.ch.forEach(function(c) {
+          var d = document.createElement('div'); d.className = 'p-card' + (c.id === Store.d.aid ? ' sel' : '');
+          d.innerHTML = '<div class="p-dot" style="background:' + c.cl + ';"></div><div style="font-size:28px;">' + c.av + '</div><b style="color:#0f172a;font-size:15px;">' + c.nm + '</b><span>Kls ' + c.gr + ' • Pulau ' + c.ci + '/6</span><span>⭐ ' + c.sc + ' Poin</span>';
+          d.onclick = function() { Store.pick(c.id); AudioSys.coin(); if (gid === 'g-quick') { document.getElementById('m-switch').style.display = 'none'; startIsl(c.ci || 1); } };
+          g.appendChild(d);
+        });
+        var a = document.createElement('div'); a.className = 'p-card add';
+        a.innerHTML = '<div style="font-size:24px;">➕</div><b>Tambah Anak</b><span>(Via Ortu)</span>';
+        a.onclick = function() { askPin('pt-ch'); }; g.appendChild(a);
+      });
+    }
+
+    function rAsst() {
+      var c = Store.cur(), list = document.getElementById('a-t-list'); list.innerHTML = '';
+      document.getElementById('a-title').textContent = '🤖 Asisten Piko - ' + c.av + ' ' + c.nm;
+      var flt = c.ts.filter(function(x) { return Store.flt === 'Semua' || x.p === Store.flt; }).sort(function(a, b) { return a.tm.localeCompare(b.tm); });
+      flt.forEach(function(t) {
+        var it = document.createElement('div'); it.className = 't-item' + (t.d ? ' done' : '');
+        var lf = document.createElement('div'); lf.className = 't-left';
+        lf.onclick = function() {
+          t.d = !t.d; if (t.d) { c.sc += 25; AudioSys.coin(); pSpin = 1.2; if (ready3D) burst(piko.position, 0x38bdf8); } else c.sc = Math.max(0, c.sc - 25);
+          rAsst();
+        };
+        lf.innerHTML = '<div class="t-chk">' + (t.d ? '✓' : '') + '</div><div><div class="t-txt" style="font-weight:600;">' + t.t + '</div><div style="font-size:12px;color:#64748b;">🕒 ' + t.tm + ' • ' + t.p + ' • +25 Poin</div></div>';
+        var dl = document.createElement('button'); dl.type = 'button'; dl.textContent = '🗑️'; dl.style.cssText = 'border:none;background:none;cursor:pointer;font-size:15px;';
+        dl.onclick = function() { c.ts = c.ts.filter(function(x) { return x.id !== t.id; }); rAsst(); };
+        it.appendChild(lf); it.appendChild(dl); list.appendChild(it);
+      });
+      var dn = c.ts.filter(function(x) { return x.d; }).length, tot = c.ts.length, pct = tot ? Math.round((dn / tot) * 100) : 0;
+      document.getElementById('a-pr-lbl').textContent = 'Progres: ' + dn + '/' + tot + ' (' + pct + '%)';
+      document.getElementById('a-pr-fill').style.width = pct + '%';
+      document.getElementById('a-rk-lbl').textContent = pct >= 100 ? '🏆 Hebat!' : (pct >= 50 ? '🔥 Rajin!' : '🌟 Ayo!');
+      document.getElementById('st-info').innerHTML = '👤 <b>' + c.av + ' ' + c.nm + '</b> (Kelas ' + c.gr + ' SD)<br>🏝️ <b>Pulau Terbuka:</b> ' + c.ui + ' / 6<br>⭐ <b>Total Poin:</b> ' + c.sc + '<br>📋 <b>Tugas Hari Ini:</b> ' + dn + '/' + tot + '<br>💎 <b>Kristal Pulau Ini:</b> ' + gs.cr + '/8';
+      updHUD();
+    }
+
+    var pTab = 'pt-ch', nChr = 'boy', nCl = '#d93838';
+    function askPin(tab) { pTab = tab || 'pt-ch'; gs.pau = true; document.getElementById('pin-in').value = ''; document.getElementById('pin-err').textContent = ''; document.getElementById('m-pin').style.display = 'flex'; }
+    function chkPin() {
+      if (document.getElementById('pin-in').value.trim() === Store.d.pin) { document.getElementById('m-pin').style.display = 'none'; openOrtu(pTab); }
+      else { AudioSys.no(); document.getElementById('pin-err').textContent = 'PIN salah! (default: 1234)'; }
+    }
+    function openOrtu(tab) {
+      gs.pau = true; document.getElementById('m-switch').style.display = 'none'; document.getElementById('m-asst').style.display = 'none';
+      swPTab(tab); rOrtuCh(); popPSel(); rPTasks(); document.getElementById('m-parent').style.display = 'flex';
+    }
+    function swPTab(t) {
+      document.querySelectorAll('[data-pt]').forEach(function(b) { b.classList.toggle('act', b.dataset.pt === t); });
+      ['pt-ch', 'pt-sc', 'pt-st'].forEach(function(id) { document.getElementById(id).style.display = id === t ? 'block' : 'none'; });
+    }
+    function rOrtuCh() {
+      var w = document.getElementById('p-ch-list'); w.innerHTML = '';
+      Store.d.ch.forEach(function(c) {
+        var r = document.createElement('div'); r.className = 't-item';
+        r.innerHTML = '<div><b>' + c.av + ' ' + c.nm + '</b> (Kls ' + c.gr + ')<br><small style="color:#64748b;">Pulau ' + c.ui + '/6 • ⭐ ' + c.sc + '</small></div><div style="display:flex;gap:5px;"><button type="button" class="b-btn b-go">Main</button><button type="button" class="b-btn b-jd" style="background:#fef3c7;color:#92400e;">Jadwal</button><button type="button" class="b-btn b-dl" style="background:#fee2e2;color:#b91c1c;">Hapus</button></div>';
+        r.querySelector('.b-go').onclick = function() { Store.pick(c.id); document.getElementById('m-parent').style.display = 'none'; if (gs.run) startIsl(c.ci || 1); };
+        r.querySelector('.b-jd').onclick = function() { document.getElementById('p-sel-ch').value = c.id; swPTab('pt-sc'); rPTasks(); };
+        r.querySelector('.b-dl').onclick = function() {
+          if (Store.d.ch.length <= 1) return alert('Minimal 1 profil anak!');
+          Store.d.ch = Store.d.ch.filter(function(x) { return x.id !== c.id; });
+          if (Store.d.aid === c.id) Store.pick(Store.d.ch[0].id); else { Store.save(); rGrids(); }
+          rOrtuCh(); popPSel();
+        };
+        w.appendChild(r);
+      });
+    }
+    function popPSel() {
+      var s = document.getElementById('p-sel-ch'), pv = s.value; s.innerHTML = '';
+      Store.d.ch.forEach(function(c) { var o = document.createElement('option'); o.value = c.id; o.textContent = c.av + ' ' + c.nm + ' (Kls ' + c.gr + ')'; s.appendChild(o); });
+      if (Store.d.ch.some(function(c) { return c.id === pv; })) s.value = pv;
+    }
+    function rPTasks() {
+      var cid = document.getElementById('p-sel-ch').value, c = Store.d.ch.find(function(x) { return x.id === cid; }) || Store.cur();
+      var l = document.getElementById('p-t-list'); l.innerHTML = '';
+      c.ts.slice().sort(function(a, b) { return a.tm.localeCompare(b.tm); }).forEach(function(t) {
+        var it = document.createElement('div'); it.className = 't-item' + (t.d ? ' done' : '');
+        it.innerHTML = '<div><b>' + t.t + '</b><br><small>🕒 ' + t.tm + ' • ' + t.p + '</small></div>';
+        var dl = document.createElement('button'); dl.type = 'button'; dl.textContent = '🗑️'; dl.style.cssText = 'border:none;background:none;cursor:pointer;';
+        dl.onclick = function() { c.ts = c.ts.filter(function(x) { return x.id !== t.id; }); Store.save(); updHUD(); rPTasks(); };
+        it.appendChild(dl); l.appendChild(it);
+      });
+    }
+
+    Store.load(); gs.isl = Store.cur().ci || 1; rGrids(); rCharBars(); updHUD(); Tmr.ui();
+    document.getElementById('snd-btn').onclick = function(e) { AudioSys.on = !AudioSys.on; e.target.textContent = AudioSys.on ? '🔊' : '🔇'; };
+    document.getElementById('hud-isl').onclick = openMap; document.getElementById('btn-map1').onclick = openMap;
+    document.getElementById('hud-shop').onclick = function() { openShop('sh-chr'); };
+    document.getElementById('x-shop').onclick = function() { document.getElementById('m-shop').style.display = 'none'; if (gs.run && !gs.won) gs.pau = false; };
+    document.querySelectorAll('[data-sht]').forEach(function(b) { b.onclick = function() { openShop(b.dataset.sht); }; });
+    document.querySelectorAll('.sh-sw').forEach(function(s) {
+      s.onclick = function() { var c = Store.cur(); c.cl = s.dataset.scl; syncGear(); Store.save(); rGrids(); rCharBars(); AudioSys.coin(); };
+    });
+    document.getElementById('btn-map2').onclick = function() { document.getElementById('m-win').style.display = 'none'; openMap(); };
+    document.getElementById('x-map').onclick = function() { document.getElementById('m-map').style.display = 'none'; if (gs.run && !gs.won) gs.pau = false; };
+    document.getElementById('btn-ortu1').onclick = function() { askPin('pt-ch'); };
+    document.getElementById('btn-ortu2').onclick = function() { askPin('pt-ch'); };
+    document.getElementById('btn-ortu3').onclick = function() { askPin('pt-ch'); };
+    document.getElementById('hud-prof').onclick = function() { gs.pau = true; rGrids(); document.getElementById('m-switch').style.display = 'flex'; };
+    document.getElementById('x-switch').onclick = function() { document.getElementById('m-switch').style.display = 'none'; if (gs.run && !gs.won) gs.pau = false; };
+    document.getElementById('pin-ok').onclick = chkPin;
+    document.getElementById('pin-in').onkeydown = function(e) { if (e.key === 'Enter') chkPin(); };
+    document.getElementById('pin-no').onclick = function() { document.getElementById('m-pin').style.display = 'none'; if (gs.run && document.getElementById('m-switch').style.display !== 'flex') gs.pau = false; };
+    document.getElementById('x-parent').onclick = function() { document.getElementById('m-parent').style.display = 'none'; rGrids(); if (gs.run && !gs.won) gs.pau = false; };
+    document.querySelectorAll('[data-pt]').forEach(function(b) { b.onclick = function() { swPTab(b.dataset.pt); }; });
+    document.querySelectorAll('[data-pch]').forEach(function(b) { b.onclick = function() { document.querySelectorAll('[data-pch]').forEach(function(x) { x.classList.remove('act'); }); b.classList.add('act'); nChr = b.dataset.pch; }; });
+    document.querySelectorAll('[data-cl]').forEach(function(b) { b.onclick = function() { document.querySelectorAll('[data-cl]').forEach(function(x) { x.classList.remove('act'); }); b.classList.add('act'); nCl = b.dataset.cl; }; });
+    document.getElementById('save-ch').onclick = function() {
+      var nm = document.getElementById('ch-nm').value.trim(); if (!nm) return alert('Isi nama anak!');
+      var pr = CHAR_PRESETS.find(function(x) { return x.id === nChr; }) || CHAR_PRESETS[0];
+      var nc = { id: 'c_' + Date.now(), nm: nm, gr: Number(document.getElementById('ch-gr').value) || 1, av: pr.av, chr: pr.id, cl: nCl, sc: 0, ci: 1, ui: 1, doneI: [], own: [], hat: 'cap', cape: false, turbo: false, ld: today(), ts: defTasks() };
+      Store.d.ch.push(nc); Store.pick(nc.id); document.getElementById('ch-nm').value = ''; AudioSys.ok(); rOrtuCh(); popPSel();
+    };
+    document.getElementById('p-sel-ch').onchange = rPTasks;
+    document.getElementById('p-rst-t').onclick = function() { var c = Store.d.ch.find(function(x) { return x.id === document.getElementById('p-sel-ch').value; }); if (c) { c.ts.forEach(function(t) { t.d = false; }); Store.save(); updHUD(); rPTasks(); } };
+    document.getElementById('p-t-form').onsubmit = function(e) {
+      e.preventDefault(); var c = Store.d.ch.find(function(x) { return x.id === document.getElementById('p-sel-ch').value; }), v = document.getElementById('p-t-in').value.trim();
+      if (!c || !v) return; c.ts.push({ id: 'pt_' + Date.now(), t: '📌 ' + v, tm: document.getElementById('p-t-tm').value, p: document.getElementById('p-t-pd').value, d: false });
+      document.getElementById('p-t-in').value = ''; Store.save(); updHUD(); rPTasks(); AudioSys.coin();
+    };
+    document.getElementById('np-ok').onclick = function() {
+      var np = document.getElementById('np-in').value.trim(), m = document.getElementById('np-msg');
+      if (np.length < 4 || !/^\d+$/.test(np)) { m.style.color = '#dc2626'; m.textContent = 'Harus 4-6 angka!'; return; }
+      Store.d.pin = np; Store.save(); document.getElementById('np-in').value = ''; m.style.color = '#16a34a'; m.textContent = '✅ PIN tersimpan!';
+    };
+
+    function openAsst() {
+      gs.pau = true; rstKeys(); document.getElementById('piko-bubble').style.display = 'none';
+      var h = new Date().getHours(), c = Store.cur();
+      document.getElementById('a-greet').textContent = (h < 11 ? 'Selamat pagi, ' : (h < 15 ? 'Selamat siang, ' : (h < 18 ? 'Selamat sore, ' : 'Selamat malam, '))) + c.nm + '! Ayo cek kegiatanmu!';
+      rAsst(); document.getElementById('m-asst').style.display = 'flex';
+    }
+    function clAsst() { document.getElementById('m-asst').style.display = 'none'; if (document.getElementById('m-quiz').style.display !== 'flex' && !gs.won && gs.run) gs.pau = false; }
+    document.getElementById('hud-asst').onclick = openAsst; document.getElementById('x-asst').onclick = clAsst;
+    document.getElementById('pb-op').onclick = openAsst; document.getElementById('pb-cl').onclick = function() { document.getElementById('piko-bubble').style.display = 'none'; };
+    document.getElementById('pb-spk').onclick = function() { AudioSys.speak(document.getElementById('pb-txt').textContent); };
+    document.getElementById('a-t-form').onsubmit = function(e) {
+      e.preventDefault(); var c = Store.cur(), v = document.getElementById('a-t-in').value.trim(); if (!v) return;
+      c.ts.push({ id: 'ct_' + Date.now(), t: '📌 ' + v, tm: document.getElementById('a-t-tm').value, p: document.getElementById('a-t-pd').value, d: false });
+      document.getElementById('a-t-in').value = ''; AudioSys.coin(); rAsst();
+    };
+    document.querySelectorAll('.chip[data-f]').forEach(function(b) { b.onclick = function() { document.querySelectorAll('.chip[data-f]').forEach(function(x) { x.classList.remove('act'); }); b.classList.add('act'); Store.flt = b.dataset.f; rAsst(); }; });
+    document.querySelectorAll('[data-at]').forEach(function(b) { b.onclick = function() { document.querySelectorAll('[data-at]').forEach(function(x) { x.classList.remove('act'); }); b.classList.add('act'); ['at-sch', 'at-tm', 'at-st'].forEach(function(id) { document.getElementById(id).style.display = id === b.dataset.at ? 'block' : 'none'; }); }; });
+    document.querySelectorAll('.pr-btn').forEach(function(b) { b.onclick = function() { Tmr.set(Number(b.dataset.m), b.dataset.l, Number(b.dataset.r)); }; });
+    document.getElementById('tm-go').onclick = function() { Tmr.tog(); }; document.getElementById('tm-rs').onclick = function() { Tmr.rst(); };
+
+    function startIsl(num) {
+      AudioSys.init(); var c = Store.cur(), n = Math.min(6, Math.max(1, num));
+      c.ci = n; gs.isl = n; Store.save();
+      document.getElementById('m-start').style.display = 'none'; document.getElementById('m-win').style.display = 'none'; document.getElementById('m-map').style.display = 'none';
+      if (ready3D) {
+        buildIsl(n); plr.position.set(0, gLvl(0, 0) + 0.1, 0); plr.rotation.y = 0; syncGear(); piko.position.set(-1.3, plr.position.y + 2.3, -0.5);
+      } else alert('Library 3D Three.js belum termuat. Pastikan ada koneksi internet lalu refresh.');
+      gs.run = true; gs.pau = false; gs.won = false; gs.cr = 0; gs.vy = 0; gs.ca = 0; gs.sc = c.sc || 0; updHUD();
+      var th = ISLANDS[n - 1]; bubble('Pulau ' + n + ': ' + th.nm + '! Tiap kristal berisi 3-5 soal berpoin!', 7500); AudioSys.speak('Selamat datang di ' + th.nm + ', ' + c.nm + '!');
+    }
+    document.getElementById('btn-play').onclick = function() { startIsl(Store.cur().ci || 1); };
+    document.getElementById('btn-rep').onclick = function() { startIsl(gs.isl); };
+    document.getElementById('btn-next').onclick = function() { startIsl(gs.isl < 6 ? gs.isl + 1 : 1); };
+
+    function showQStep(cr) {
+      gs.qTries = 0; gs.qLock = false;
+      var qd = cr.qs[cr.qi], tot = cr.qs.length;
+      document.getElementById('q-sub').textContent = qd.s;
+      document.getElementById('q-prg').textContent = '💎 Soal ' + (cr.qi + 1) + ' / ' + tot;
+      document.getElementById('q-bar').style.width = Math.round((cr.qi / tot) * 100) + '%';
+      document.getElementById('q-txt').textContent = qd.q; document.getElementById('q-fb').textContent = '';
+      var op = document.getElementById('q-opts'); op.innerHTML = '';
+
+      qd.o.forEach(function(tx, i) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'opt-btn'; b.textContent = tx;
+        b.onclick = function() {
+          if (cr.col || gs.qLock) return;
+          var fb = document.getElementById('q-fb');
+          if (i === qd.a) {
+            gs.qLock = true;
+            var pts = 40 + (gs.qTries === 0 ? 10 : 0);
+            b.classList.add('ok'); fb.style.color = '#16a34a';
+            Array.from(op.children).forEach(function(x) { x.disabled = true; });
+            var c = Store.cur(); cr.qi++;
+            document.getElementById('q-bar').style.width = Math.round((cr.qi / tot) * 100) + '%';
+            if (cr.qi < tot) {
+              c.sc += pts; gs.sc = c.sc; updHUD(); AudioSys.coin();
+              fb.textContent = '🎉 Benar! +' + pts + ' Poin! Lanjut soal ' + (cr.qi + 1) + '...';
+              setTimeout(function() { showQStep(cr); }, 750);
+            } else {
+              c.sc += pts + 50; gs.sc = c.sc; cr.col = true; gs.cr++; updHUD(); AudioSys.ok(); pSpin = 1.4;
+              fb.textContent = '💎 Kristal Didapat! +' + (pts + 50) + ' Poin!';
+              burst(cr.g.position, 0xfacc15); islGrp.remove(cr.g);
+              setTimeout(function() {
+                document.getElementById('m-quiz').style.display = 'none'; gs.pau = false; gs.ac = null; gs.qLock = false;
+                if (gs.cr >= 8) {
+                  gs.won = true; gs.pau = true; AudioSys.win();
+                  if (c.doneI.indexOf(gs.isl) === -1) c.doneI.push(gs.isl);
+                  if (gs.isl < 6 && c.ui < gs.isl + 1) c.ui = gs.isl + 1;
+                  Store.save(); rGrids();
+                  var nb = document.getElementById('btn-next');
+                  if (gs.isl < 6) {
+                    var nt = ISLANDS[gs.isl];
+                    document.getElementById('w-tit').textContent = '🎉 Pulau ' + gs.isl + ' Selesai!';
+                    document.getElementById('w-dsc').innerHTML = 'Hebat <b>' + c.nm + '</b>! Pulau ' + (gs.isl + 1) + ' (<b>' + nt.nm + '</b> ' + nt.ic + ') sekarang terbuka!';
+                    nb.textContent = 'Lanjut ke Pulau ' + (gs.isl + 1) + ' ➡️';
+                  } else {
+                    document.getElementById('w-tit').textContent = '🏆 JUARA 6 PULAU!';
+                    document.getElementById('w-dsc').innerHTML = 'Luar biasa <b>' + c.nm + '</b>! Semua 6 Pulau Pintar sudah kamu taklukkan!';
+                    nb.textContent = 'Main Lagi dari Pulau 1 🌟';
+                  }
+                  document.getElementById('w-sc').textContent = gs.sc; document.getElementById('m-win').style.display = 'flex';
+                }
+              }, 950);
+            }
+          } else { gs.qTries++; b.classList.add('no'); b.disabled = true; fb.style.color = '#dc2626'; fb.textContent = 'Belum tepat, coba pilihan lain ya! 💪'; AudioSys.no(); }
+        };
+        op.appendChild(b);
+      });
+    }
+    function openQuiz(cr) { gs.pau = true; gs.ac = cr; rstKeys(); showQStep(cr); document.getElementById('m-quiz').style.display = 'flex'; }
+    document.getElementById('x-quiz').onclick = function() { if (gs.qLock) return; if (gs.ac) gs.ac.cd = true; document.getElementById('m-quiz').style.display = 'none'; gs.pau = false; gs.ac = null; };
+
+    var ks = { up: false, down: false, left: false, right: false, jump: false, rl: false, rr: false, shift: false };
+    var joy = { active: false, id: null, x: 0, y: 0 };
+    function rstKeys() { Object.keys(ks).forEach(function(k) { ks[k] = false; }); joy.active = false; joy.id = null; joy.x = 0; joy.y = 0; document.getElementById('joy-knob').style.transform = 'translate(0px,0px)'; }
+    window.onkeydown = function(e) {
+      var tg = document.activeElement ? document.activeElement.tagName : ''; if (tg === 'INPUT' || tg === 'SELECT') return;
+      var k = e.key.toLowerCase();
+      if (k === 'm' && gs.run && document.getElementById('m-quiz').style.display !== 'flex') { if (document.getElementById('m-asst').style.display === 'flex') clAsst(); else openAsst(); return; }
+      if (k === 'w' || e.key === 'ArrowUp') ks.up = true; if (k === 's' || e.key === 'ArrowDown') ks.down = true;
+      if (k === 'a' || e.key === 'ArrowLeft') ks.left = true; if (k === 'd' || e.key === 'ArrowRight') ks.right = true;
+      if (k === 'q') ks.rl = true; if (k === 'e') ks.rr = true; if (e.key === 'Shift') ks.shift = true;
+      if (e.code === 'Space') { e.preventDefault(); ks.jump = true; }
+    };
+    window.onkeyup = function(e) {
+      var k = e.key.toLowerCase();
+      if (k === 'w' || e.key === 'ArrowUp') ks.up = false; if (k === 's' || e.key === 'ArrowDown') ks.down = false;
+      if (k === 'a' || e.key === 'ArrowLeft') ks.left = false; if (k === 'd' || e.key === 'ArrowRight') ks.right = false;
+      if (k === 'q') ks.rl = false; if (k === 'e') ks.rr = false; if (e.key === 'Shift') ks.shift = false;
+      if (e.code === 'Space') ks.jump = false;
+    };
+
+    var jZone = document.getElementById('joy-zone'), jKnob = document.getElementById('joy-knob');
+    function updJoy(t) {
+      var rect = jZone.getBoundingClientRect(), cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+      var dx = t.clientX - cx, dy = t.clientY - cy, maxR = 38, dist = Math.hypot(dx, dy);
+      if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
+      joy.x = dx / maxR; joy.y = dy / maxR;
+      jKnob.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    }
+    jZone.addEventListener('touchstart', function(e) { e.preventDefault(); e.stopPropagation(); var t = e.changedTouches[0]; joy.active = true; joy.id = t.identifier; updJoy(t); }, { passive: false });
+    jZone.addEventListener('touchmove', function(e) { e.preventDefault(); e.stopPropagation(); for (var i = 0; i < e.changedTouches.length; i++) if (e.changedTouches[i].identifier === joy.id) updJoy(e.changedTouches[i]); }, { passive: false });
+    function endJoy(e) { for (var i = 0; i < e.changedTouches.length; i++) if (e.changedTouches[i].identifier === joy.id) { joy.active = false; joy.id = null; joy.x = 0; joy.y = 0; jKnob.style.transform = 'translate(0px,0px)'; } }
+    jZone.addEventListener('touchend', endJoy); jZone.addEventListener('touchcancel', endJoy);
+    document.getElementById('t-jump').addEventListener('touchstart', function(e) { e.preventDefault(); e.stopPropagation(); ks.jump = true; }, { passive: false });
+    document.getElementById('t-jump').addEventListener('touchend', function() { ks.jump = false; });
+    document.getElementById('t-jump').addEventListener('touchcancel', function() { ks.jump = false; });
+
+    // 3D WORLD ENGINE
+    var ready3D = false, sc, cam, ren, skyM, watM, watG, watN, islGrp, plr, jMat, hjbMat, piko, pwL, pwR, boat, lA, rA, lL, rL;
+    var capG, crwnG, propG, propBl, capeM, hairBoy, hairGirl, hijabG, peciG, skirtM, ambGrp, ambPts = [];
+    var palms = [], clds = [], bfs = [], crs = [], cns = [], pts = [], obs = [], cY = 2.8, dY = 1.05, pSpin = 0, hasPier = true, stMat, wdMat, dwMat, bkMat, tBmp;
+    function sm(a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+    function gH(x, z, id) {
+      var r = Math.hypot(x, z), t = Math.min(1, r / 38), sd = (id || gs.isl) * 1.75;
+      return 4.2 * Math.pow(Math.max(0, 1 - Math.pow(t, 2.2)), 1.4) - 1.4 + (Math.sin(x * 0.14 + sd) * Math.cos(z * 0.13 - sd) * 0.85 + Math.cos(x * 0.27 - z * 0.21 + sd * 1.5) * 0.35) * sm(5.5, 11, r) * (1 - sm(21, 28, r));
+    }
+    function gLvl(x, z) {
+      var h = gH(x, z, gs.isl);
+      if (Math.hypot(x, z) < 4.7) h = Math.max(h, cY + 0.36);
+      if (hasPier && Math.abs(x) < 1.75 && z >= 22.8 && z <= 35.8) h = Math.max(h, dY + 0.08);
+      return h;
+    }
+    function mkNoise(sz, r, g, b, v, sx, sy, rp) {
+      var c = document.createElement('canvas'); c.width = c.height = sz; var x = c.getContext('2d'), im = x.createImageData(sz, sz);
+      for (var y = 0; y < sz; y++) for (var i = 0; i < sz; i++) {
+        var k = (y * sz + i) * 4, d = (Math.sin(i * 0.15 * sx + Math.cos(y * 0.12 * sy) * 2) * 0.5 + (Math.random() - 0.5)) * v;
+        im.data[k] = Math.min(255, Math.max(0, r + d)); im.data[k + 1] = Math.min(255, Math.max(0, g + d)); im.data[k + 2] = Math.min(255, Math.max(0, b + d)); im.data[k + 3] = 255;
+      }
+      x.putImageData(im, 0, 0); var tx = new THREE.CanvasTexture(c); tx.wrapS = tx.wrapT = THREE.RepeatWrapping; tx.repeat.set(rp, rp); return tx;
+    }
+    function org(geo, amt) {
+      var p = geo.attributes.position;
+      for (var i = 0; i < p.count; i++) { var x = p.getX(i), y = p.getY(i), z = p.getZ(i), n = Math.sin(x * 3.1 + y * 2.7 + z * 4.3) * amt; p.setXYZ(i, x * (1 + n), y * (1 + n * 0.6), z * (1 + n)); }
+      geo.computeVertexNormals(); return geo;
+    }
+    function burst(pos, col) {
+      if (!ready3D) return;
+      for (var i = 0; i < 12; i++) {
+        var p = new THREE.Mesh(new THREE.OctahedronGeometry(0.18, 0), new THREE.MeshBasicMaterial({ color: col }));
+        p.position.copy(pos); p.position.y += 1.5; sc.add(p);
+        pts.push({ m: p, v: new THREE.Vector3((Math.random() - 0.5) * 11, 4.5 + Math.random() * 6, (Math.random() - 0.5) * 11), l: 1 });
+      }
+    }
+    function syncGear() {
+      if (!ready3D) return;
+      var c = Store.cur(), chr = c.chr || 'boy';
+      jMat.color.set(c.cl || '#d93838');
+      hjbMat.color.set(c.cl || '#ec4899').lerp(new THREE.Color(0xffffff), 0.28);
+
+      hairBoy.visible = (chr === 'boy' || chr === 'peci');
+      hairGirl.visible = (chr === 'girl');
+      hijabG.visible = (chr === 'hijab');
+      peciG.visible = (chr === 'peci' && c.hat === 'cap');
+      skirtM.visible = (chr === 'girl' || chr === 'hijab');
+
+      capG.visible = (c.hat === 'cap' && (chr === 'boy' || chr === 'girl'));
+      crwnG.visible = (c.hat === 'crown');
+      propG.visible = (c.hat === 'prop');
+      capeM.visible = !!c.cape;
+    }
+
+    var CSPOTS = [[0,-13],[11.5,-10.5],[15.5,1],[10.5,13],[-2,16],[-12,11],[-16,-1],[-11,-12]];
+    var CCOLS = [0x3b82f6,0xec4899,0xa855f7,0x06b6d4,0xf59e0b,0x10b981,0xf43f5e,0x6366f1];
+
+    function buildIsl(num) {
+      if (!ready3D) return;
+      var th = ISLANDS[num - 1] || ISLANDS[0]; hasPier = th.pier;
+      while (islGrp.children.length > 0) islGrp.remove(islGrp.children[0]);
+      while (ambGrp.children.length > 0) ambGrp.remove(ambGrp.children[0]);
+      obs = []; crs = []; cns = []; bfs = []; palms = []; ambPts = [];
+
+      skyM.uniforms.uT.value.setHex(th.sT); skyM.uniforms.uM.value.setHex(th.sM); skyM.uniforms.uH.value.setHex(th.sH);
+      sc.fog.color.setHex(th.fg); watM.color.setHex(th.wt);
+
+      var segs = isMob ? 72 : 108;
+      var tg = new THREE.PlaneGeometry(86, 86, segs, segs); tg.rotateX(-1.57);
+      var tp = tg.attributes.position, tc = new Float32Array(tp.count * 3);
+      var cDS = new THREE.Color(th.dsd), cS = new THREE.Color(th.sd), cL = new THREE.Color(th.gL), cH = new THREE.Color(th.gH), cP = new THREE.Color(th.pt), tmp = new THREE.Color();
+      for (var i = 0; i < tp.count; i++) {
+        var x = tp.getX(i), z = tp.getZ(i), y = gH(x, z, num); tp.setY(i, y);
+        if (y < 0.05) tmp.copy(cDS).lerp(cS, sm(-0.8, 0.05, y));
+        else if (y < 0.85) tmp.copy(cS).lerp(cL, sm(0.35, 0.85, y));
+        else tmp.copy(cL).lerp(cH, sm(1.2, 3.2, y));
+        var pd = Math.abs(x - Math.sin(z * 0.15) * 1.4); if (z > 4 && z < 26 && pd < 2.1) tmp.lerp(cP, (1 - sm(0.6, 2.1, pd)) * 0.72);
+        tc[i * 3] = tmp.r; tc[i * 3 + 1] = tmp.g; tc[i * 3 + 2] = tmp.b;
+      }
+      tg.setAttribute('color', new THREE.BufferAttribute(tc, 3)); tg.computeVertexNormals();
+      var tm = new THREE.Mesh(tg, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, bumpMap: tBmp, bumpScale: 0.08 })); tm.receiveShadow = true; islGrp.add(tm);
+
+      cY = gH(0, 0, num);
+      var pl = new THREE.Mesh(new THREE.CylinderGeometry(4.8, 5.4, 0.5, 24), stMat); pl.position.set(0, cY + 0.1, 0); pl.receiveShadow = true; islGrp.add(pl);
+      if (th.mn === 'plaza') for (var i = 0; i < 4; i++) { var a = (i / 4) * 6.28 + 0.78, px = Math.cos(a) * 4.2, pz = Math.sin(a) * 4.2, p = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.4, 2.8, 10), stMat); p.position.set(px, cY + 1.5, pz); p.castShadow = true; islGrp.add(p); obs.push({ x: px, z: pz, r: 0.5 }); }
+      else if (th.mn === 'arch') { var am = new THREE.MeshStandardMaterial({ color: 0xe11d48 }), pL = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 3.6, 10), am); pL.position.set(-2.2, cY + 2, -3.5); var pR = pL.clone(); pR.position.x = 2.2; var bm = new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.45, 0.6), am); bm.position.set(0, cY + 3.8, -3.5); islGrp.add(pL, pR, bm); obs.push({ x: -2.2, z: -3.5, r: 0.45 }, { x: 2.2, z: -3.5, r: 0.45 }); }
+      else if (th.mn === 'pyramid') { var py = new THREE.Mesh(new THREE.ConeGeometry(3.2, 4.2, 4), new THREE.MeshStandardMaterial({ color: 0xeab308 })); py.rotation.y = 0.78; py.position.set(0, cY + 2.4, -3.2); py.castShadow = true; islGrp.add(py); obs.push({ x: 0, z: -3.2, r: 2.2 }); }
+      else if (th.mn === 'igloo') { var ig = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 12, 0, 6.28, 0, 1.57), new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.4 })); ig.position.set(0, cY + 0.35, -2.8); islGrp.add(ig); obs.push({ x: 0, z: -2.8, r: 2.3 }); }
+      else if (th.mn === 'spire') { var sp = new THREE.Mesh(new THREE.OctahedronGeometry(1.5, 0), new THREE.MeshPhysicalMaterial({ color: 0xa855f7, emissive: 0x7e22ce, emissiveIntensity: 0.6, roughness: 0.1, clearcoat: 1 })); sp.scale.set(1, 2.5, 1); sp.position.set(0, cY + 3.8, -3.2); islGrp.add(sp); obs.push({ x: 0, z: -3.2, r: 1.2 }); }
+      else { var cp = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 0.5, 2, 16), new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.85, roughness: 0.15 })); cp.position.set(0, cY + 2.4, -3.2); islGrp.add(cp); obs.push({ x: 0, z: -3.2, r: 1.1 }); }
+
+      if (th.pier) {
+        var pg = new THREE.Group();
+        for (var pz = 23.2; pz <= 35.4; pz += 0.75) { var pk = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.14, 0.68), wdMat); pk.position.set(0, dY, pz); pk.castShadow = true; pk.receiveShadow = true; pg.add(pk); }
+        [24, 28, 32, 35.2].forEach(function(zp, ix) { [-1.55, 1.55].forEach(function(xp) { var po = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.19, 2.8, 10), dwMat); po.position.set(xp, 0.3, zp); pg.add(po); if (ix === 3) { var ln = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.15, 0.35, 8), new THREE.MeshStandardMaterial({ color: 0xfef08a, emissive: 0xf59e0b, emissiveIntensity: 1.4 })); ln.position.set(xp, 1.85, zp); pg.add(ln); } }); });
+        islGrp.add(pg);
+      }
+
+      [[-9,-9],[11,-8],[-14,7],[13,11],[-19,-12],[19,-11],[-17,15],[18,15],[6,-19],[-7,19],[21,2],[-21,-2],[9,18],[-12,-18]].forEach(function(ps, ix) {
+        var tx = ps[0], tz = ps[1], y = gH(tx, tz, num); if (y < 0.7) return;
+        var s = 0.9 + (ix % 3) * 0.18, g = new THREE.Group();
+        if (th.tr === 'cactus') {
+          var cm = new THREE.MeshStandardMaterial({ color: th.tc[ix % 3] }), tr = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * s, 0.38 * s, 3 * s, 10), cm); tr.position.y = 1.5 * s; tr.castShadow = true;
+          var aL = new THREE.Mesh(new THREE.CylinderGeometry(0.2 * s, 0.22 * s, 1.2 * s, 8), cm); aL.position.set(-0.55 * s, 1.8 * s, 0); aL.rotation.z = 0.6;
+          var aR = aL.clone(); aR.position.set(0.55 * s, 2 * s, 0); aR.rotation.z = -0.6; g.add(tr, aL, aR);
+        } else if (th.tr === 'sakura' || th.tr === 'rain') {
+          var t2 = new THREE.Mesh(new THREE.CylinderGeometry(0.22 * s, 0.42 * s, 2.5 * s, 10), bkMat); t2.position.y = 1.25 * s; t2.castShadow = true; g.add(t2);
+          [[0,3.1,0,1.8],[-1,2.6,0.6,1.3],[1,2.7,-0.5,1.35]].forEach(function(pt, ci) { var pf = new THREE.Mesh(org(new THREE.IcosahedronGeometry(pt[3] * s, 1), 0.15), new THREE.MeshStandardMaterial({ color: th.tc[(ix + ci) % 3], roughness: 0.78 })); pf.position.set(pt[0] * s, pt[1] * s, pt[2] * s); pf.castShadow = true; g.add(pf); });
+        } else if (th.tr === 'crys') {
+          var t3 = new THREE.Mesh(new THREE.CylinderGeometry(0.25 * s, 0.45 * s, 1.2 * s, 8), stMat); t3.position.y = 0.6 * s; g.add(t3);
+          var cl = th.tc[ix % 3], sh = new THREE.Mesh(new THREE.OctahedronGeometry(1.1 * s, 0), new THREE.MeshPhysicalMaterial({ color: cl, emissive: cl, emissiveIntensity: 0.35, roughness: 0.15, clearcoat: 1 })); sh.scale.set(0.8, 2, 0.8); sh.position.y = 2.4 * s; sh.castShadow = true; g.add(sh);
+        } else {
+          var t4 = new THREE.Mesh(new THREE.CylinderGeometry(0.24 * s, 0.46 * s, 2.6 * s, 10), bkMat); t4.position.y = 1.3 * s; t4.castShadow = true; g.add(t4);
+          [{ r: 2, h: 2.4, y: 2.8, c: th.tc[0] }, { r: 1.55, h: 2.2, y: 4.1, c: th.tc[1] }, { r: 1, h: 1.8, y: 5.2, c: th.tc[2] }].forEach(function(t) { var m = new THREE.Mesh(org(new THREE.ConeGeometry(t.r * s, t.h * s, 11, 2), 0.12), new THREE.MeshStandardMaterial({ color: t.c, roughness: 0.85 })); m.position.y = t.y * s; m.castShadow = true; g.add(m); });
+        }
+        g.position.set(tx, y - 0.1, tz); islGrp.add(g); obs.push({ x: tx, z: tz, r: 0.72 * s });
+      });
+
+      if (th.palm) [[23,12,0.5],[-22,13,2.4],[24,-10,-0.4],[-23,-12,3.6],[11,23,1.1],[-12,23,2]].forEach(function(p) {
+        var px = p[0], pz = p[1], y = gH(px, pz, num), plm = new THREE.Group(); plm.position.set(px, y - 0.15, pz);
+        var cx = 0, cy = 0; for (var i = 0; i < 7; i++) { var sg = new THREE.Mesh(new THREE.CylinderGeometry(0.28 - i * 0.02, 0.33 - i * 0.02, 0.85, 9), bkMat), b = i * 0.08; cx += Math.sin(b) * 0.35; cy += Math.cos(b) * 0.75; sg.position.set(cx, cy, 0); sg.rotation.z = -b; sg.castShadow = true; plm.add(sg); }
+        var cr = new THREE.Group(); cr.position.set(cx, cy + 0.2, 0); var fm = new THREE.MeshStandardMaterial({ color: 0x3b8c2a, side: THREE.DoubleSide });
+        for (var f = 0; f < 7; f++) { var fr = new THREE.Mesh(new THREE.ConeGeometry(0.45, 2.7, 5), fm); fr.scale.set(1, 1, 0.15); fr.rotation.z = -1.2; fr.position.x = 1.2; var pv = new THREE.Group(); pv.rotation.y = (f / 7) * 6.28; pv.add(fr); cr.add(pv); }
+        plm.add(cr); palms.push(cr); plm.rotation.y = p[2]; islGrp.add(plm); obs.push({ x: px, z: pz, r: 0.55 });
+      });
+
+      [[7,-14],[-8,12],[16,-4],[-16,-6],[6,15],[-20,4]].forEach(function(rp) {
+        var s = 0.75 + Math.random() * 0.55, y = gH(rp[0], rp[1], num), rk = new THREE.Mesh(org(new THREE.IcosahedronGeometry(s, 1), 0.22), th.tr === 'snow' ? new THREE.MeshPhysicalMaterial({ color: 0xbae6fd, roughness: 0.2, clearcoat: 0.8 }) : stMat);
+        rk.position.set(rp[0], y + s * 0.35, rp[1]); rk.castShadow = true; islGrp.add(rk); obs.push({ x: rp[0], z: rp[1], r: s * 0.88 });
+      });
+
+      for (var fi = 0; fi < 28; fi++) {
+        var an = Math.random() * 6.28, rd = 6 + Math.random() * 18, fx = Math.cos(an) * rd, fz = Math.sin(an) * rd, fy = gH(fx, fz, num);
+        if (fy > 0.9) {
+          var fg = new THREE.Group(), st = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.35, 5), new THREE.MeshStandardMaterial({ color: 0x166534 })); st.position.y = 0.17;
+          var pt = new THREE.Mesh(new THREE.DodecahedronGeometry(0.16, 0), new THREE.MeshStandardMaterial({ color: th.fc[fi % 4] })); pt.position.y = 0.36; fg.add(st, pt); fg.position.set(fx, fy, fz); islGrp.add(fg);
+          if (fi % 3 === 0) { var bf = new THREE.Group(), wm = new THREE.MeshBasicMaterial({ color: th.fc[(fi + 1) % 4], side: THREE.DoubleSide }), wL = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.16), wm), wR = wL.clone(); wL.position.x = -0.11; wR.position.x = 0.11; bf.add(wL, wR); bf.position.set(fx, fy + 0.9, fz); islGrp.add(bf); bfs.push({ g: bf, wL: wL, wR: wR, cx: fx, cz: fz, y: fy + 1, ph: Math.random() * 10 }); }
+        }
+      }
+
+      var wxCol = th.wx === 'snow' ? 0xffffff : (th.wx === 'petal' ? 0xf9a8d4 : (th.wx === 'ember' ? 0xfb923c : (th.wx === 'star' ? 0x38bdf8 : 0xfef08a)));
+      var wxMat = new THREE.MeshBasicMaterial({ color: wxCol, transparent: true, opacity: 0.85, side: THREE.DoubleSide });
+      var wxGeo = th.wx === 'petal' ? new THREE.PlaneGeometry(0.22, 0.14) : new THREE.OctahedronGeometry(0.11, 0);
+      for (var wi = 0; wi < 42; wi++) {
+        var wp = new THREE.Mesh(wxGeo, wxMat);
+        wp.position.set((Math.random() - 0.5) * 34, 1 + Math.random() * 12, (Math.random() - 0.5) * 34);
+        ambGrp.add(wp);
+        ambPts.push({ m: wp, vy: th.wx === 'ember' ? (1.2 + Math.random()) : -(0.8 + Math.random() * 1.4), vx: (Math.random() - 0.5) * 0.9, ph: Math.random() * 6 });
+      }
+
+      var curGrade = Store.cur().gr;
+      CSPOTS.forEach(function(sp, ix) {
+        var x = sp[0], z = sp[1], y = gH(x, z, num), g = new THREE.Group(), cl = CCOLS[(ix + num) % CCOLS.length];
+        var ped = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 1.05, 0.75, 12), stMat); ped.position.y = 0.35; ped.castShadow = true;
+        var gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.85, 0), new THREE.MeshPhysicalMaterial({ color: cl, emissive: cl, emissiveIntensity: 0.45, roughness: 0.08, clearcoat: 1 })); gem.scale.set(0.85, 1.35, 0.85); gem.position.y = 2; gem.castShadow = true;
+        var bm = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.85, 18, 16, 1, true), new THREE.MeshBasicMaterial({ color: cl, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false })); bm.position.y = 9.5;
+        var rg = new THREE.Mesh(new THREE.RingGeometry(1.15, 1.48, 28), new THREE.MeshBasicMaterial({ color: cl, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })); rg.rotation.x = -1.57; rg.position.y = 0.08;
+        g.add(ped, gem, bm, rg); g.position.set(x, y, z); islGrp.add(g);
+        crs.push({ g: g, gem: gem, rg: rg, qs: getCrystalQs(curGrade), qi: 0, col: false, cd: false });
+      });
+
+      var cs = []; for (var ci = 0; ci < 13; ci++) { var a = (ci / 13) * 6.28, r = 7 + (ci % 3) * 5.8, cx = Math.cos(a) * r, cz = Math.sin(a) * r; cs.push([cx, gH(cx, cz, num) + 1.05, cz]); }
+      if (th.pier) [26, 30, 34].forEach(function(pz) { cs.push([0, dY + 1.05, pz]); });
+      var cmt = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0x9a6b00, emissiveIntensity: 0.25, metalness: 0.85, roughness: 0.18 });
+      cs.forEach(function(p) { var c = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.12, 18), cmt); c.rotation.x = 1.57; c.position.set(p[0], p[1], p[2]); c.castShadow = true; islGrp.add(c); cns.push({ m: c, col: false }); });
+    }
+
+    function init3D() {
+      if (typeof THREE === 'undefined') return;
+      var ct = document.getElementById('game-container');
+      sc = new THREE.Scene(); sc.background = new THREE.Color(0x7dd3fc); sc.fog = new THREE.FogExp2(0x9bd7f5, 0.0075);
+      cam = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.2, 320);
+      ren = new THREE.WebGLRenderer({ antialias: !isMob, powerPreference: 'high-performance' });
+      ren.setSize(window.innerWidth, window.innerHeight); ren.setPixelRatio(Math.min(window.devicePixelRatio, isMob ? 1.5 : 2));
+      ren.shadowMap.enabled = true; ren.shadowMap.type = THREE.PCFSoftShadowMap; ren.toneMapping = THREE.ACESFilmicToneMapping; ren.toneMappingExposure = 1.08; ren.outputEncoding = THREE.sRGBEncoding;
+      ct.appendChild(ren.domElement);
+
+      var sd = new THREE.Vector3(45, 38, -32).normalize();
+      skyM = new THREE.ShaderMaterial({
+        side: THREE.BackSide, depthWrite: false,
+        uniforms: { uS: { value: sd }, uT: { value: new THREE.Color(0x1c6bd0) }, uM: { value: new THREE.Color(0x70c2f5) }, uH: { value: new THREE.Color(0xdbeeff) } },
+        vertexShader: 'varying vec3 vW; void main(){ vec4 w=modelMatrix*vec4(position,1.0); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }',
+        fragmentShader: 'varying vec3 vW; uniform vec3 uS,uT,uM,uH; void main(){ vec3 d=normalize(vW); float h=clamp(d.y,0.,1.); vec3 c=mix(uH,uM,smoothstep(0.,.25,h)); c=mix(c,uT,smoothstep(.22,.85,h)); float s=max(dot(d,normalize(uS)),0.); c+=vec3(1.,.9,.65)*pow(s,12.)*.35+vec3(1.,.98,.9)*smoothstep(.996,.9992,s)*1.4; gl_FragColor=vec4(c,1.); }'
+      });
+      sc.add(new THREE.Mesh(new THREE.SphereGeometry(200, 28, 20), skyM));
+      sc.add(new THREE.HemisphereLight(0xbbe6ff, 0x3b6e38, 0.65));
+      var sun = new THREE.DirectionalLight(0xfff5db, 1.65); sun.position.copy(sd).multiplyScalar(65); sun.castShadow = true;
+      var shSz = isMob ? 1024 : 2048; sun.shadow.mapSize.set(shSz, shSz);
+      sun.shadow.camera.left = sun.shadow.camera.bottom = -42; sun.shadow.camera.right = sun.shadow.camera.top = 42; sun.shadow.bias = -0.0004; sc.add(sun);
+
+      tBmp = mkNoise(256, 128, 128, 128, 55, 1, 1, 18);
+      wdMat = new THREE.MeshStandardMaterial({ map: mkNoise(128, 139, 90, 43, 30, 0.2, 3, 2), roughness: 0.85 });
+      dwMat = new THREE.MeshStandardMaterial({ color: 0x54361b, roughness: 0.92 });
+      stMat = new THREE.MeshStandardMaterial({ map: mkNoise(128, 155, 155, 150, 35, 1, 1, 2), roughness: 0.88 });
+      bkMat = new THREE.MeshStandardMaterial({ map: mkNoise(128, 102, 68, 42, 35, 3, 0.3, 2), roughness: 0.95 });
+
+      var wSeg = isMob ? 32 : 48;
+      watG = new THREE.PlaneGeometry(340, 340, wSeg, wSeg); watG.rotateX(-1.57); watN = mkNoise(128, 128, 128, 240, 40, 2, 2, 16);
+      watM = new THREE.MeshStandardMaterial({ color: 0x0685b8, roughness: 0.14, metalness: 0.35, bumpMap: watN, bumpScale: 0.12, transparent: true, opacity: 0.88 });
+      var wm = new THREE.Mesh(watG, watM); wm.position.y = 0.02; wm.receiveShadow = true; sc.add(wm);
+
+      boat = new THREE.Group();
+      var hl = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.55, 4.2, 12), wdMat); hl.rotation.z = 1.57; hl.scale.set(0.65, 1, 1.2);
+      var ms = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 4.2, 8), dwMat); ms.position.y = 2.1;
+      var sl = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3), new THREE.MeshStandardMaterial({ color: 0xfdf8ee, side: THREE.DoubleSide })); sl.position.set(0.1, 2.4, 0.6); sl.rotation.y = 0.3;
+      boat.add(hl, ms, sl); boat.position.set(16, 0.2, 38); boat.rotation.y = -0.5; sc.add(boat);
+
+      var cm = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+      for (var i = 0; i < 8; i++) {
+        var cg = new THREE.Group(); [[0,0,0,3],[2.4,-0.4,0.3,2.2],[-2.3,-0.5,-0.2,2.2]].forEach(function(p) { var pf = new THREE.Mesh(new THREE.SphereGeometry(p[3], 12, 10), cm); pf.position.set(p[0], p[1], p[2]); pf.scale.y = 0.65; cg.add(pf); });
+        cg.position.set((Math.random() - 0.5) * 130, 24 + Math.random() * 8, (Math.random() - 0.5) * 130); sc.add(cg); clds.push({ m: cg, s: 0.45 + Math.random() * 0.4 });
+      }
+
+      islGrp = new THREE.Group(); sc.add(islGrp);
+      ambGrp = new THREE.Group(); sc.add(ambGrp);
+
+      // KARAKTER 3D & PRESET (COWOK, CEWEK, BERHIJAB, PECI)
+      plr = new THREE.Group();
+      var sm2 = new THREE.MeshStandardMaterial({ color: 0xf5cba7 }), hairMat = new THREE.MeshStandardMaterial({ color: 0x3b2314, roughness: 0.9 });
+      jMat = new THREE.MeshStandardMaterial({ color: Store.cur().cl });
+      hjbMat = new THREE.MeshStandardMaterial({ color: 0xf9a8d4, roughness: 0.78 });
+
+      var ts = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.42, 0.95, 14), jMat); ts.position.y = 1.18; ts.castShadow = true;
+      skirtM = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.56, 0.64, 16), jMat); skirtM.position.y = 0.90; skirtM.castShadow = true;
+      var scf = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.1, 10, 18), new THREE.MeshStandardMaterial({ color: 0xfacc15 })); scf.rotation.x = 1.57; scf.position.y = 1.65;
+      var bp = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.72, 0.34), new THREE.MeshStandardMaterial({ color: 0xd97706 })); bp.position.set(0, 1.22, -0.4);
+      var hd = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 14), sm2); hd.position.y = 2.06; hd.castShadow = true;
+
+      hairBoy = new THREE.Mesh(new THREE.SphereGeometry(0.435, 14, 12, 0, 6.28, 0, 1.85), hairMat);
+      hairBoy.position.set(0, 2.09, -0.02); hairBoy.rotation.x = -0.35;
+
+      hairGirl = new THREE.Group();
+      var hgTop = hairBoy.clone();
+      var bunL = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 10), hairMat); bunL.position.set(-0.46, 2.04, -0.1);
+      var bunR = bunL.clone(); bunR.position.x = 0.46;
+      var tieMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e });
+      var tieL = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.03, 6, 12), tieMat); tieL.position.set(-0.41, 2.05, -0.08); tieL.rotation.y = 1.57;
+      var tieR = tieL.clone(); tieR.position.x = 0.41;
+      hairGirl.add(hgTop, bunL, bunR, tieL, tieR);
+
+      hijabG = new THREE.Group();
+      var hHood = new THREE.Mesh(new THREE.SphereGeometry(0.455, 18, 14), hjbMat); hHood.position.set(0, 2.08, -0.06); hHood.castShadow = true;
+      var hRim = new THREE.Mesh(new THREE.TorusGeometry(0.37, 0.065, 10, 20), hjbMat); hRim.position.set(0, 2.06, 0.16);
+      var hDrape = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.56, 0.58, 16), hjbMat); hDrape.position.set(0, 1.62, -0.02); hDrape.castShadow = true;
+      hijabG.add(hHood, hRim, hDrape);
+
+      peciG = new THREE.Mesh(new THREE.CylinderGeometry(0.37, 0.39, 0.28, 16), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 }));
+      peciG.position.y = 2.47; peciG.castShadow = true;
+
+      capG = new THREE.Group();
+      var hm = new THREE.MeshStandardMaterial({ color: 0x1d68b8 }), hb = new THREE.Mesh(new THREE.CylinderGeometry(0.66, 0.68, 0.07, 16), hm), hc = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 0.34, 16), hm);
+      hb.position.y = 2.38; hc.position.y = 2.55; capG.add(hb, hc);
+
+      crwnG = new THREE.Group();
+      var gMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.85, roughness: 0.2 });
+      var cb = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.38, 0.2, 12), gMat); cb.position.y = 2.52; crwnG.add(cb);
+      for (var k = 0; k < 4; k++) { var spk = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.26, 6), gMat); var ka = (k / 4) * 6.28; spk.position.set(Math.cos(ka) * 0.26, 2.72, Math.sin(ka) * 0.26); crwnG.add(spk); }
+
+      propG = new THREE.Group();
+      var pmHat = new THREE.Mesh(new THREE.SphereGeometry(0.45, 14, 10, 0, 6.28, 0, 1.57), new THREE.MeshStandardMaterial({ color: 0xef4444 })); pmHat.position.y = 2.35;
+      propBl = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.05, 0.14), new THREE.MeshStandardMaterial({ color: 0xfacc15 })); propBl.position.y = 2.86;
+      propG.add(pmHat, propBl);
+
+      capeM = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.05, 0.08), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.7 }));
+      capeM.position.set(0, 1.15, -0.58); capeM.rotation.x = 0.22; capeM.castShadow = true;
+
+      plr.add(ts, skirtM, scf, bp, hd, hairBoy, hairGirl, hijabG, peciG, capG, crwnG, propG, capeM);
+      [-0.16, 0.16].forEach(function(ex) { var ew = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff })); ew.position.set(ex, 2.09, 0.36); var ep = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), new THREE.MeshBasicMaterial({ color: 0x0f172a })); ep.position.set(ex, 2.09, 0.41); plr.add(ew, ep); });
+      function lmb(a) {
+        var pv = new THREE.Group();
+        if (a) { var m = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.68, 10), jMat); m.position.y = -0.3; pv.add(m); }
+        else { var l = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.12, 0.56, 10), new THREE.MeshStandardMaterial({ color: 0x264673 })); l.position.y = -0.26; var bt = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.2, 0.34), dwMat); bt.position.set(0, -0.58, 0.05); pv.add(l, bt); }
+        return pv;
+      }
+      lA = lmb(true); lA.position.set(-0.48, 1.56, 0); rA = lmb(true); rA.position.set(0.48, 1.56, 0);
+      lL = lmb(false); lL.position.set(-0.2, 0.7, 0); rL = lmb(false); rL.position.set(0.2, 0.7, 0);
+      plr.add(lA, rA, lL, rL); sc.add(plr);
+
+      piko = new THREE.Group();
+      var pb = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 14), new THREE.MeshPhysicalMaterial({ color: 0xf8fafc, metalness: 0.25, roughness: 0.15, clearcoat: 1 }));
+      var pv = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.24, 0.18), new THREE.MeshStandardMaterial({ color: 0x0f172a })); pv.position.set(0, 0.04, 0.3);
+      var peL = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 8), new THREE.MeshBasicMaterial({ color: 0x38bdf8 })); peL.position.set(-0.12, 0.04, 0.38); var peR = peL.clone(); peR.position.x = 0.12;
+      var pwm = new THREE.MeshStandardMaterial({ color: 0x0284c7 }); pwL = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.06), pwm); pwL.position.set(-0.46, 0.02, -0.05); pwR = pwL.clone(); pwR.position.x = 0.46;
+      piko.add(pb, pv, peL, peR, pwL, pwR); sc.add(piko);
+
+      var camPid = null, px = 0, py = 0;
+      ren.domElement.addEventListener('pointerdown', function(e) { if (camPid === null) { camPid = e.pointerId; px = e.clientX; py = e.clientY; } });
+      window.addEventListener('pointermove', function(e) {
+        if (e.pointerId !== camPid || gs.pau) return;
+        gs.ca -= (e.clientX - px) * 0.007; gs.cp = Math.max(0.18, Math.min(1.05, gs.cp + (e.clientY - py) * 0.005));
+        px = e.clientX; py = e.clientY;
+      });
+      function endCam(e) { if (e.pointerId === camPid) camPid = null; }
+      window.addEventListener('pointerup', endCam); window.addEventListener('pointercancel', endCam);
+      ren.domElement.addEventListener('wheel', function(e) { gs.cd = Math.max(6.5, Math.min(19, gs.cd + e.deltaY * 0.01)); }, { passive: true });
+      window.onresize = function() {
+        cam.aspect = window.innerWidth / window.innerHeight; cam.updateProjectionMatrix(); ren.setSize(window.innerWidth, window.innerHeight);
+        if (('ontouchstart' in window) || window.innerWidth <= 900) document.body.classList.add('is-mobile');
+      };
+
+      ready3D = true; syncGear(); buildIsl(gs.isl); plr.position.set(0, cY + 0.36, 0); piko.position.set(-1.3, cY + 2.5, -0.5);
+    }
+
+    var clk = typeof THREE !== 'undefined' ? new THREE.Clock() : null;
+    function anim() {
+      requestAnimationFrame(anim); Tmr.tick();
+      if (!ready3D || !clk) return;
+      var dt = Math.min(clk.getDelta(), 0.05), el = clk.getElapsedTime();
+
+      watN.offset.x = el * 0.025; watN.offset.y = el * 0.018;
+      var wp = watG.attributes.position;
+      for (var i = 0; i < wp.count; i++) wp.setY(i, Math.sin(wp.getX(i) * 0.14 + el * 1.8) * 0.13 + Math.cos(wp.getZ(i) * 0.16 + el * 1.5) * 0.1);
+      wp.needsUpdate = true; watG.computeVertexNormals();
+
+      boat.position.y = 0.18 + Math.sin(el * 1.6) * 0.14; boat.rotation.z = Math.sin(el * 1.3) * 0.06;
+      palms.forEach(function(c, i) { c.rotation.z = Math.sin(el * 1.7 + i) * 0.05; });
+      clds.forEach(function(c) { c.m.position.x += c.s * dt; if (c.m.position.x > 70) c.m.position.x = -70; });
+      bfs.forEach(function(b) { var t = el * 1.5 + b.ph; b.g.position.set(b.cx + Math.cos(t) * 1.4, b.y + Math.sin(t * 3) * 0.25, b.cz + Math.sin(t * 1.3) * 1.4); b.g.rotation.y = -t; var fl = Math.sin(el * 22 + b.ph) * 0.85; b.wL.rotation.y = fl; b.wR.rotation.y = -fl; });
+      crs.forEach(function(c, i) { if (!c.col) { c.gem.rotation.y += 1.6 * dt; c.gem.position.y = 2 + Math.sin(el * 2.8 + i) * 0.22; var s = 1 + Math.sin(el * 4 + i) * 0.09; c.rg.scale.set(s, s, 1); } });
+      cns.forEach(function(c) { if (!c.col) c.m.rotation.z += 2.6 * dt; });
+      if (propG.visible) propBl.rotation.y += 14 * dt;
+
+      ambPts.forEach(function(a) {
+        a.m.position.y += a.vy * dt; a.m.position.x += (a.vx + Math.sin(el + a.ph) * 0.35) * dt; a.m.rotation.y += dt;
+        if (a.m.position.y < 0.5) a.m.position.y = 12.5; else if (a.m.position.y > 13.5) a.m.position.y = 1.0;
+        if (a.m.position.x - plr.position.x > 17) a.m.position.x -= 34; else if (a.m.position.x - plr.position.x < -17) a.m.position.x += 34;
+        if (a.m.position.z - plr.position.z > 17) a.m.position.z -= 34; else if (a.m.position.z - plr.position.z < -17) a.m.position.z += 34;
+      });
+
+      for (var i = pts.length - 1; i >= 0; i--) { var p = pts[i]; p.v.y -= 18 * dt; p.m.position.addScaledVector(p.v, dt); p.l -= dt * 1.25; p.m.scale.setScalar(Math.max(p.l, 0.01)); if (p.l <= 0) { sc.remove(p.m); pts.splice(i, 1); } }
+
+      if (gs.run && !gs.pau) {
+        if (ks.rl) gs.ca += 2.1 * dt; if (ks.rr) gs.ca -= 2.1 * dt;
+        var mx = joy.active ? joy.x : ((ks.right ? 1 : 0) - (ks.left ? 1 : 0));
+        var mz = joy.active ? joy.y : ((ks.down ? 1 : 0) - (ks.up ? 1 : 0));
+        var mag = Math.min(1, Math.hypot(mx, mz));
+        if (mag > 0.08) {
+          var chCur = Store.cur(), spd = (chCur.turbo ? 13.0 : 9.5) * (ks.shift ? 1.3 : 1.0) * mag;
+          var wa = Math.atan2(mx, mz) + gs.ca, nx = plr.position.x + Math.sin(wa) * spd * dt, nz = plr.position.z + Math.cos(wa) * spd * dt;
+          if (Math.hypot(nx, nz) <= 27.6 || (hasPier && Math.abs(nx) < 1.65 && nz >= 22.8 && nz <= 35.6)) { plr.position.x = nx; plr.position.z = nz; }
+          var df = wa - plr.rotation.y; while (df > Math.PI) df -= 6.283; while (df < -Math.PI) df += 6.283;
+          plr.rotation.y += df * 0.22; gs.wt += dt * (spd * 1.3);
+          lL.rotation.x = Math.sin(gs.wt) * 0.65; rL.rotation.x = -Math.sin(gs.wt) * 0.65; lA.rotation.x = -Math.sin(gs.wt) * 0.55; rA.rotation.x = Math.sin(gs.wt) * 0.55;
+          if (capeM.visible) capeM.rotation.x = 0.35 + Math.sin(gs.wt * 1.5) * 0.14;
+        } else {
+          lL.rotation.x *= 0.8; rL.rotation.x *= 0.8; lA.rotation.x *= 0.8; rA.rotation.x *= 0.8;
+          if (capeM.visible) capeM.rotation.x = 0.18;
+        }
+
+        if (ks.jump && gs.gnd) { gs.vy = 10.5; gs.gnd = false; AudioSys.jump(); }
+        var gy = gLvl(plr.position.x, plr.position.z); gs.vy -= 26 * dt; plr.position.y += gs.vy * dt;
+        if (plr.position.y <= gy) { plr.position.y = gy; gs.vy = 0; gs.gnd = true; }
+        obs.forEach(function(o) { var dx = plr.position.x - o.x, dz = plr.position.z - o.z, d = Math.hypot(dx, dz), m = o.r + 0.52; if (d < m && d > 0.001) { var p = (m - d) / d; plr.position.x += dx * p; plr.position.z += dz * p; } });
+        cns.forEach(function(c) { if (!c.col && Math.hypot(plr.position.x - c.m.position.x, plr.position.z - c.m.position.z) < 1.35 && Math.abs(plr.position.y - c.m.position.y) < 1.8) { c.col = true; islGrp.remove(c.m); var ch = Store.cur(); ch.sc += 20; gs.sc = ch.sc; updHUD(); AudioSys.coin(); burst(c.m.position, 0xfacc15); } });
+
+        var nearD = 999, nearC = null;
+        crs.forEach(function(c) {
+          if (!c.col) {
+            var d = Math.hypot(plr.position.x - c.g.position.x, plr.position.z - c.g.position.z);
+            if (d < nearD) { nearD = d; nearC = c; }
+            if (d < 2 && !c.cd) openQuiz(c); else if (d > 3 && c.cd) c.cd = false;
+          }
+        });
+        if (nearC) {
+          var vx = nearC.g.position.x - plr.position.x, vz = nearC.g.position.z - plr.position.z;
+          var fwd = -vx * Math.sin(gs.ca) - vz * Math.cos(gs.ca), rgt = vx * Math.cos(gs.ca) - vz * Math.sin(gs.ca);
+          var deg = Math.atan2(rgt, fwd) * 57.2958;
+          document.getElementById('comp-arr').style.transform = 'rotate(' + Math.round(deg) + 'deg)';
+          document.getElementById('comp-dst').textContent = Math.round(nearD) + 'm';
+        } else { document.getElementById('comp-dst').textContent = '✓'; }
+      }
+
+      var poa = plr.rotation.y - 2.13;
+      piko.position.x += (plr.position.x + Math.sin(poa) * 1.45 - piko.position.x) * 0.08;
+      piko.position.z += (plr.position.z + Math.cos(poa) * 1.45 - piko.position.z) * 0.08;
+      piko.position.y += (plr.position.y + 2.35 + Math.sin(el * 3.2) * 0.2 - piko.position.y) * 0.1;
+      if (pSpin > 0) { pSpin -= dt; piko.rotation.y += 12 * dt; } else { var pd = plr.rotation.y - piko.rotation.y; while (pd > Math.PI) pd -= 6.283; while (pd < -Math.PI) pd += 6.283; piko.rotation.y += pd * 0.1; }
+      pwL.rotation.z = 0.25 + Math.sin(el * 8) * 0.15; pwR.rotation.z = -0.25 - Math.sin(el * 8) * 0.15;
+
+      var hd = gs.cd * Math.cos(gs.cp), vd = gs.cd * Math.sin(gs.cp) + 1.8;
+      var tcx = plr.position.x + Math.sin(gs.ca) * hd, tcz = plr.position.z + Math.cos(gs.ca) * hd, tcy = Math.max(gH(tcx, tcz, gs.isl) + 1.5, plr.position.y + vd);
+      cam.position.x += (tcx - cam.position.x) * 0.12; cam.position.z += (tcz - cam.position.z) * 0.12; cam.position.y += (tcy - cam.position.y) * 0.12;
+      cam.lookAt(plr.position.x, plr.position.y + 1.6, plr.position.z);
+      ren.render(sc, cam);
+    }
+
+    try { init3D(); } catch (e) { console.error(e); }
+    anim();
+  </script>
+</body>
+</html>
